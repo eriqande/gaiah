@@ -10,17 +10,16 @@
 #' number of individuals per site, and the corresponding precip mean and SD extracted from the appropriate precip isoscape
 #'
 #' Function includes:
-#table = the filename (with directory, if applicable) from which to load the data
+#calibration =  the table that you would get by reading table: table = the filename (with directory, if applicable) from which to load the data
 #siteID = column # containing unique site IDS
 #count = column # containing number of individuals sampled per site
 #tissue.mean = column # containing mean d2H tissue values of individuals sampled at each site
 #tissue.SD = column # containing SD of d2H tissue values of individuals sampled at each site
 #precip.mean = column # containing mean d2H precip values at each site
 #precip.SD = column # containing SD of d2H precip values at each site
-
-rescale <- function(table, siteIDs, count, tissue.mean, tissue.SD, precip.mean, precip.SD) {
-  calibration <- read.table(table, header=TRUE,
-                            sep=",", na.strings="NA")
+rescale <- function(calibration, siteIDs, count, tissue.mean, tissue.SD, precip.mean, precip.SD) {
+#  calibration <- read.table(table, header=TRUE,
+#                            sep=",", na.strings="NA")
 
   AllSites <- unique(calibration[, siteIDs])
   slopes <- vector('numeric', length=1000)
