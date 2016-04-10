@@ -38,6 +38,10 @@ as well.
 This function returns a data frame with columns for the mean and SD of feather/bird values,
 (\code{meanH} and \code{sdH}) and the mean predicted isotope value and the mean sd of the predicted
 isotope values (\code{meaniso} and \code{sdiso}) for all the samples within each location.  It
+also returns the Location column itself and a column \code{cnt} that gives the number of bird/tissue
+samples from each location.
+
+This function
 throws an error if any of the locations has only 1 sample.  If that is the case, you may consider
 merging that sample with another location (or dropping it?).
 }

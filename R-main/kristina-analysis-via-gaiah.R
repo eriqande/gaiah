@@ -48,3 +48,5 @@ feather.dat$Location[feather.dat$Location=="Charlevoix"] <- "Camp Myrica"
 fcalnew.dat <- gaiah::group_birds_by_location(D = feather.dat, feather_isotope_col = "Isotope.Value", location_col = "Location")
 
 
+# here we run the rescale function as it was implemented by vander zanden and colleagues
+gaiah:::rescale(as.data.frame(fcalnew.dat), 1, 2, 3, 4, 5, 6)
