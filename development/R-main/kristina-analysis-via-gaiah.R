@@ -1,6 +1,7 @@
 
 library(gaiah)
-
+library(dplyr)
+library(ggplot2)
 
 # this executes what Kristina does in the her script
 # "Kristina WIWA isotopes.R" but it does it using the functions
@@ -49,4 +50,32 @@ fcalnew.dat <- gaiah::group_birds_by_location(D = feather.dat, feather_isotope_c
 
 
 # here we run the rescale function as it was implemented by vander zanden and colleagues
-gaiah:::rescale(as.data.frame(fcalnew.dat), 1, 2, 3, 4, 5, 6)
+# commented out because we don't want to run it again.  It takes forever: over 11 minutes!
+# user  system elapsed
+# 624.461   9.178 665.952
+# system.time(old_rescale_output <- gaiah:::rescale(as.data.frame(fcalnew.dat), 1, 2, 3, 4, 5, 6))
+# saveRDS(old_rescale_output, file = "development/outputs/old_rescale_output.rds")
+
+# now we just get that saved result.
+old_rescale_results <- readRDS("development/outputs/old_rescale_output.rds")
+
+# now, for comparison, run the new, efficient version.  2.5 seconds.  So, it is only 266 times faster.
+system.time(new_results <- vza_rescale(fcalnew.dat))
+
+
+# lets compare the outputs by plotting their density estimates
+oldtidy <- setNames(old_rescale_results, c("slope", "intercept")) %>%
+  tidyr::gather(param, value, slope, intercept) %>%
+  tbl_df
+newtidy <- tidyr::gather(new_results, param, value, slope, intercept)
+
+DF <- bind_rows(list(Original = oldtidy, Eric = newtidy), .id = "Method")
+
+ggplot(DF, aes(x = value, fill = Method)) +
+  geom_density(alpha = 0.2) +
+  facet_wrap(~ param, scales = "free")
+
+# ggsave(file = "development/outputs/simulated-slope-intercept-compare.pdf")
+
+# check the distribution of mean slopes
+# fifty_trials <- sapply(1:50, function(x) mean(vza_rescale(fcalnew.dat)$slope))
