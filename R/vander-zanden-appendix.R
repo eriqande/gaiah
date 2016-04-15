@@ -42,13 +42,43 @@ vza_rescale <- function(SBL, Reps = 1000) {
     unlist() %>%
     matrix(ncol = 2, byrow = TRUE) %>%
     as.data.frame() %>%
-    setNames(c("intercept", "slope")) %>%
+    setNames(c("intercepts", "slopes")) %>%
     dplyr::tbl_df()
-
 }
 
 
+#' calculate a raster of mean and SD of expected tissue isotopes from precip data and resampled regressions
+#'
+#' This is a rewrite of the function \code{raster.conversion} from the Vander Zanden
+#' appendix.
+#' @param iso_raster the raster of isotope precipitation values, for example, like that
+#' produced by \code{\link{isomap2raster}}.
+#' @param si  slopes and intercepts from the resampled regressions.  This is a data frame
+#' with columns named "slopes" and "intercepts" like that returned by \code{\link{vza_rescale}}
+#' @export
+vza_mean_and_sd_rasters <- function(iso_raster, si) {
 
+  # note, with really large rasters, we may end up wanting to write them to disk, but
+  # I really doubt it for most of our work...
+  stopifnot("slopes" %in% names(si),  "intercepts" %in% names(si))
+
+  slopes <- si$slopes
+  intercepts <- si$intercepts
+
+  # make a list of rasters of tissue isotopes predicted by the resampled regressions:
+  rlist <- lapply(seq_along(slopes), function(i) {
+    iso_raster * slopes[i] + intercepts[i]
+  })
+
+  # make a RasterStack
+  rstack <- raster::stack(rlist)
+
+  # return the mean and SD of those:
+  list(
+    mean.raster = iso_raster * mean(slopes) + mean(intercepts),
+    SD.raster = raster::stackApply(rstack, fun = sd, indices = 1)
+  )
+}
 
 
 ######### BELOW HERE ARE ALL THE ORIGINAL VERSIONS OF THE FUNCTIONS ##################
@@ -111,3 +141,32 @@ rescale <- function(calibration, siteIDs, count, tissue.mean, tissue.SD, precip.
   intercept <-mean(intercepts)
   return(data.frame(slopes, intercepts))
 }
+
+
+
+
+
+###### RASTER CONVERSION ######
+#This function uses the output from the rescaling function to convert the precip rasters to tissue-specific mean raster and rescale SD raster (used in the pooled error)
+#Function includes:
+#original.raster = the filename (and directory, if applicable) of the original precip raster created in IsoMAP
+#reg.par = the output from the function above
+#scratch.dir = the directory of a scratch folder to store the rasters temporarily
+
+raster.conversion <- function (original.raster, reg.par, scratch.dir) {
+
+  for (i in 1:length(reg.par[,1])) {
+    reg.par.i <- reg.par[i,]
+    raster.i <- original.raster*reg.par.i$slopes + reg.par.i$intercepts
+    name <- paste(scratch.dir, i, ".grd", sep="")
+    writeRaster(raster.i, filename=name, overwrite=TRUE)
+  }
+  setwd(scratch.dir)
+  all.files <- dir(pattern=".grd")
+  n <- length(all.files)
+  all.rasters <- stack(all.files)
+  mean.raster <- original.raster*mean(reg.par$slopes) + mean(reg.par$intercepts)
+  SD.raster <- stackApply(all.rasters, fun=sd, indices=c(rep(1,n)))
+  return(list(mean.raster=mean.raster, SD.raster=SD.raster))
+}
+
