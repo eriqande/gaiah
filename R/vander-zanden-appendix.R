@@ -77,16 +77,23 @@ rescale <- function(calibration, siteIDs, count, tissue.mean, tissue.SD, precip.
   slopes <- vector('numeric', length=1000)
   intercepts <- vector('numeric', length=1000)
 
+
   for (k in 1:1000){
     print(paste("Hold your horses, I am working on k =", k))
     counter <- 1
     tissue.d2H <- vector('numeric', length=sum(calibration[,count]))
     precip.d2H <- vector('numeric', length=sum(calibration[,count]))
 
+    # eric added this line to see what is happening regarding over-running tissue and precip.d2H
+    print(paste("Original length of tissue.d2H: ", length(tissue.d2H)))
+
     for (i in 1:length(AllSites)){
       Site.i <- AllSites[i]
       Data.i <- calibration[calibration[,siteIDs]==Site.i,]
       n <- Data.i[,count]
+
+
+
 
       for (j in 1:n){
         tissue.d2H[counter:(counter+n-1)] <- rnorm(n, mean=Data.i[1, tissue.mean], sd=Data.i[1, tissue.SD])
@@ -96,7 +103,9 @@ rescale <- function(calibration, siteIDs, count, tissue.mean, tissue.SD, precip.
         intercepts[k] <- coef(lmResult.k)[1]
         slopes[k] <- coef(lmResult.k)[2]
 
-      }}}
+      }}
+      print(paste("Ending length of tissue.d2H: ", length(tissue.d2H)))
+    }
 
   slope <- mean(slopes)
   intercept <-mean(intercepts)
