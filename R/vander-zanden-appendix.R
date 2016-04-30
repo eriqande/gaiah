@@ -81,6 +81,44 @@ vza_mean_and_sd_rasters <- function(iso_raster, si) {
 }
 
 
+
+#' assign posterior probabilities to each bird for each cell in the raster
+#'
+#' This is a rewrite of the function \code{assignment} from the Vander
+#' Zanden appendix code.
+#' @param rescale_mean the tissue specific mean raster, such as the mean.raster
+#' component of the output of \code{vza_mean_and_sd_rasters}.
+#' @param rescale_sd tissue specific raster of standard deviations, such as the SD.raster
+#' component of the output of \code{vza_mean_and_sd_rasters}.
+#' @param precip_sd SD raster associated with the IsoMAP output.
+#' This is the precip component of the variance term.
+#' @param sd_indiv the individual component of the variance term.
+#' This is a value to be determined by the user.  The standard approach is to
+#' use the mean of the SDs observed among individuals at all of the calibration sites.
+#' @param indivs a data frame of individuals to be assigned.  It must have, at a minimum,
+#' a column named "ID" which is the unique identifier of the individual, and a column
+#' named "Isotope.Value" for the observed tissue specific isotope value.
+#' @details This returns a named list of rasters (in memory).  The names are the
+#' the IDs for each individual. The values in the rasters are posterior probabilities of
+#' originating from each of the cells.  They sum to one over all the cells.
+vza_assign <- function(rescale_mean,
+                       rescale_sd,
+                       precip_sd,
+                       sd_indiv,
+                       indivs
+                       ) {
+
+  NULL;  # THIS IS INCOMPLETE.
+}
+
+
+
+
+
+
+
+
+
 ######### BELOW HERE ARE ALL THE ORIGINAL VERSIONS OF THE FUNCTIONS ##################
 ###### RESCALING FUNCTION #######
 
@@ -169,4 +207,37 @@ raster.conversion <- function (original.raster, reg.par, scratch.dir) {
   SD.raster <- stackApply(all.rasters, fun=sd, indices=c(rep(1,n)))
   return(list(mean.raster=mean.raster, SD.raster=SD.raster))
 }
+
+
+###### ASSIGNMENT FUNCTION ######
+#This function uses the likelihood term (Equation S2 in Appendix 1) to determine the probability that an individual sample was from a particular geographic location and writes an ascii file to a chosen directory
+#Because IsoMAP produces the files in the ascii format that is compatible with ArcGIS software, I have maintained that format here and throughout
+#Function includes:
+#rescaled_raster = the tissue-specific d2H raster created in the function above
+#rescaleded_SD_raster = the SD raster created in the function above.  This the component of the error term related to the rescaling process.
+#precip_SD_raster = this is the SD raster associated with the IsoMAP output.  This is the precip component of the variance term.
+#SD_indv =the individual component of the variance term.  This is a value determined by the user.  We calculated the mean of the SDs observed among individuals at all of the calibration sites.
+#assign_table = this a csv filename (and directory, if applicable) containing the tissue d2H values of the individuals for which the assignments will be made
+#d2Htissue = column number in the assign_table with the d2H tissue values
+#ID = column number with individual identifiers
+#save_dir is where the output assignments should be saved as an ascii, but could be changed
+
+assignment <- function(rescaled_raster, rescaled_SD_raster, precip_SD_raster, SD_indv, assign_table, d2Htissue, ID, save_dir){
+  error <- sqrt((rescaled_SD_raster)^2 + (precip_SD_raster)^2 + (SD_indv)^2)
+  data <- read.table(assign_table, sep=",", header=T)
+  #   data <- data[1:5,] #temp
+  n <- length(data[,d2Htissue])
+  dir.create(save_dir, showWarnings = FALSE)
+
+  for (i in 1:n){
+    indv.data <- data[i,]
+    indv.id <- indv.data[1, ID]
+    assign <- (1/sqrt((2*pi*error^2)))*exp(-1*(indv.data[1,d2Htissue]-rescaled_raster)^2/(2*error^2))#oops, I realized that this formula was missing a square root function
+    assign_norm <- assign/cellStats(assign, "sum") #normalize so all pixels sum to 1
+    filename <- paste(save_dir, "/", indv.id, ".like", ".asc", sep="")
+    writeRaster(assign_norm, file=filename, format="ascii", overwrite=TRUE)
+  }
+}
+
+
 
