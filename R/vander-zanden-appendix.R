@@ -9,6 +9,8 @@
 #' isoscape predictions at each location. This must have columns of \code{cnt},
 #' \code{meanH}, \code{sdH}, \code{meaniso}, \code{sdiso}
 #' @param Reps Number of simulated regressions to do.  Default is 1000.
+#' @return Returns a matrix with Reps rows.  Column 1 is "intercepts" and column
+#' two is "slopes"
 #' @export
 vza_rescale <- function(SBL, Reps = 1000) {
 
@@ -47,16 +49,20 @@ vza_rescale <- function(SBL, Reps = 1000) {
 }
 
 
-#' calculate a raster of mean and SD of expected tissue isotopes from precip data and resampled regressions
+#' calculate a raster of mean and Var of expected tissue isotopes from precip data and resampled regressions
 #'
 #' This is a rewrite of the function \code{raster.conversion} from the Vander Zanden
-#' appendix.
+#' appendix.  They expressed things in terms of the standard deviations, but they need to
+#' be turned into variances, anyway, so that is what we've done here.  Following the notation
+#' of paper on Wilson's warbler, this function computes $tilde{T}^{(mu)}$ (returned as
+#' list component \code{mean.raster}) and $R^{(sigma^2)}$ (returned as list component
+#' \code{var.raster})
 #' @param iso_raster the raster of isotope precipitation values, for example, like that
 #' produced by \code{\link{isomap2raster}}.
 #' @param si  slopes and intercepts from the resampled regressions.  This is a data frame
 #' with columns named "slopes" and "intercepts" like that returned by \code{\link{vza_rescale}}
 #' @export
-vza_mean_and_sd_rasters <- function(iso_raster, si) {
+vza_mean_and_var_rasters <- function(iso_raster, si) {
 
   # note, with really large rasters, we may end up wanting to write them to disk, but
   # I really doubt it for most of our work...
@@ -76,39 +82,45 @@ vza_mean_and_sd_rasters <- function(iso_raster, si) {
   # return the mean and SD of those:
   list(
     mean.raster = iso_raster * mean(slopes) + mean(intercepts),
-    SD.raster = raster::stackApply(rstack, fun = sd, indices = 1)
+    var.raster = raster::stackApply(rstack, fun = var, indices = 1)
   )
 }
 
 
 
-#' assign posterior probabilities to each bird for each cell in the raster
+#' assign posterior probability or origin for a bird in each cell in the raster
 #'
 #' This is a rewrite of the function \code{assignment} from the Vander
 #' Zanden appendix code.
 #' @param rescale_mean the tissue specific mean raster, such as the mean.raster
-#' component of the output of \code{vza_mean_and_sd_rasters}.
-#' @param rescale_sd tissue specific raster of standard deviations, such as the SD.raster
-#' component of the output of \code{vza_mean_and_sd_rasters}.
+#' component of the output of \code{vza_mean_and_var_rasters}.
+#' @param rescale_var tissue specific raster of standard deviations, such as the var.raster
+#' component of the output of \code{vza_mean_and_var_rasters}.
 #' @param precip_sd SD raster associated with the IsoMAP output.
 #' This is the precip component of the variance term.
 #' @param sd_indiv the individual component of the variance term.
 #' This is a value to be determined by the user.  The standard approach is to
 #' use the mean of the SDs observed among individuals at all of the calibration sites.
-#' @param indivs a data frame of individuals to be assigned.  It must have, at a minimum,
-#' a column named "ID" which is the unique identifier of the individual, and a column
-#' named "Isotope.Value" for the observed tissue specific isotope value.
-#' @details This returns a named list of rasters (in memory).  The names are the
-#' the IDs for each individual. The values in the rasters are posterior probabilities of
-#' originating from each of the cells.  They sum to one over all the cells.
+#' @param birds_iso a single value giving the isotope ratio found in the individual's feather.
+#' @details This is a fairly low-level function.  It returns a raster of posterior probs (they are
+#' scaled to sum to one over all cells).
+#' @export
 vza_assign <- function(rescale_mean,
-                       rescale_sd,
+                       rescale_var,
                        precip_sd,
                        sd_indiv,
-                       indivs
+                       bird_iso
                        ) {
 
-  NULL;  # THIS IS INCOMPLETE.
+  # first we compute the tilde{T}'s.  call them Tmu and Tsig
+  Tmu <- rescale_mean    # no extra conversion to be done here
+  Tsig <- rescale_var + precip_sd^2 + sd_indiv^2
+
+  # now copy Tmu to get a raster of the right dimensions to returns then set
+  # its cell values as normal densities.
+  ret <- Tmu
+  values(ret) <- dnorm(x = bird_iso, mean = values(Tmu), sd = sqrt(values(Tsig)))
+  ret / cellStats(ret, sum)
 }
 
 

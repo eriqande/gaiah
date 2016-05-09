@@ -84,21 +84,71 @@ ggplot(DF, aes(x = value, fill = Method)) +
 #### Raster Conversion Function ####
 
 # here is the old way it was done
-system.time({
-dir.create("scratch/")
-old_rastcon <- gaiah:::raster.conversion(riso, as.data.frame(new_results), "scratch/")
-unlink("scratch", recursive = T)
-})
+#system.time({
+#dir.create("scratch/")
+#old_rastcon <- gaiah:::raster.conversion(riso, as.data.frame(new_results), "scratch/")
+#unlink("scratch", recursive = T)
+#})
 # user  system elapsed
 # 38.081   4.808  40.520
 
 
 # here is the new way (about 1/4 of the time)
 system.time({
-  new_rastcon <- gaiah::vza_mean_and_sd_rasters(riso, new_results)
+  new_rastcon <- gaiah::vza_mean_and_var_rasters(riso, new_results)
 })
 
 # check that we get the same results:
-all.equal(new_rastcon, old_rastcon)  # Yay!
+#all.equal(new_rastcon, old_rastcon)  # Yay!
 
+
+
+#### Now, compute the actual posteriors ####
+# we will compare old and new for 10 random birds here
+set.seed(10)
+randobirds <- sort(sample(1:nrow(feather.dat), 10))
+testy_birds <- feather.dat[randobirds,]
+testy_birds$Field_Num <- make.names(testy_birds$Field_Num)
+write.csv(testy_birds, file = "development/outputs/testy_birds.csv", row.names = FALSE)
+
+# here is the old code way to do it:
+dir.create("development/outputs/assignedWIWA/") #make a directory for saving assignment probabilty surfaces
+gaiah:::assignment(rescaled_raster = new_rastcon$mean.raster,
+           rescaled_SD_raster = sqrt(new_rastcon$var.raster), # 0.75 to 2.59
+           precip_SD_raster = sdiso, # 8.53 to 21.64
+           SD_indv=mean(fcalnew.dat$sdH), #12.497
+           assign_table = "development/outputs/testy_birds.csv",
+           d2Htissue = 2,
+           ID = 1,
+           save_dir="development/outputs/assignedWIWA/")
+
+# here is our new function that we will use on the
+mi_pajaros <- testy_birds$Isotope.Value
+names(mi_pajaros) <- testy_birds$Field_Num
+
+new_probs <- lapply(mi_pajaros, function(x) {
+  gaiah::vza_assign(rescale_mean = new_rastcon$mean.raster,
+                    rescale_var = new_rastcon$var.raster,
+                    precip_sd = sdiso,
+                    sd_indiv = mean(fcalnew.dat$sdH),
+                    bird_iso = x)
+})
+
+pdf(file = "development/outputs/compare-assign.pdf", width = 15, height = 40)
+par(mfrow = c(10, 3))
+old_new_compare <- lapply(names(new_probs), function(x) {
+  oldy <- raster(paste("development/outputs/assignedWIWA/", x, ".like.asc", sep = ""))
+  plot(new_probs[[x]], main = paste(x, "New"))
+  plot(oldy, main = paste(x, "Old"))
+  hist(values(oldy) - values(new_probs[[x]]), breaks = 30)
+
+  # return whether or not they are equal
+  all.equal(oldy, new_probs[[x]])
+})
+dev.off()
+
+# show that the old calcs and the new faster ones give the same results
+old_new_compare
+
+# Yay!
 
