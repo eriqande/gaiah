@@ -4,37 +4,37 @@
 #' This is a vectorized and \strong{much} more efficient implementation
 #' of the original \code{rescale} function from the Vander Zanden appendix.
 #' It takes the output of \code{\link{group_birds_by_location}} directly
-#' and does the parametric bootstrapping for Reps samples.
+#' and does the parametric bootstrapping for vza_rescale_reps samples.
 #' @param SBL the data frame that summarizes the isotope feather data and
 #' isoscape predictions at each location. This must have columns of \code{cnt},
 #' \code{meanH}, \code{sdH}, \code{meaniso}, \code{sdiso}
-#' @param Reps Number of simulated regressions to do.  Default is 1000.
-#' @return Returns a matrix with Reps rows.  Column 1 is "intercepts" and column
+#' @param vza_rescale_reps Number of simulated regressions to do.  Default is 1000.
+#' @return Returns a matrix with vza_rescale_reps rows.  Column 1 is "intercepts" and column
 #' two is "slopes"
 #' @export
-vza_rescale <- function(SBL, Reps = 1000) {
+vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
 
   D <- as.data.frame(SBL) # make sure to un-tbl-df it if need be
 
   # make a list of matrices that hold simulated values for tissue  that
   # we will bind together into one big matrix.  The rows are the simulated
-  # isotope values from the birds and the columns are the Reps
+  # isotope values from the birds and the columns are the vza_rescale_reps
   tmp <- lapply(1:nrow(D), function(i) {
     n <- D[i,"cnt"]
-    rnorm(n * Reps, mean = D[i, "meanH"], sd = D[i, "sdH"]) %>%
-      matrix(ncol = Reps)
+    rnorm(n * vza_rescale_reps, mean = D[i, "meanH"], sd = D[i, "sdH"]) %>%
+      matrix(ncol = vza_rescale_reps)
   })
   tissue_mat <- do.call(rbind, tmp)
 
   # do the same for the precip values
   tmp <- lapply(1:nrow(D), function(i) {
     n <- D[i,"cnt"]
-    rnorm(n * Reps, mean = D[i, "meaniso"], sd = D[i, "sdiso"]) %>%
-      matrix(ncol = Reps)
+    rnorm(n * vza_rescale_reps, mean = D[i, "meaniso"], sd = D[i, "sdiso"]) %>%
+      matrix(ncol = vza_rescale_reps)
   })
   precip_mat <- do.call(rbind, tmp)
 
-  # now we just do the regression of each column (1,...,Reps) of the tissue_mat and the precip_mat
+  # now we just do the regression of each column (1,...,vza_rescale_reps) of the tissue_mat and the precip_mat
   # and we grab the slopes and intercepts and return them as a data frame
   lapply(1:ncol(tissue_mat), function(i) {
     lm(tissue_mat[,i] ~ precip_mat[,i]) %>%
@@ -79,7 +79,7 @@ vza_mean_and_var_rasters <- function(iso_raster, si) {
   # make a RasterStack
   rstack <- raster::stack(rlist)
 
-  # return the mean and SD of those:
+  # return the mean and var of those:
   list(
     mean.raster = iso_raster * mean(slopes) + mean(intercepts),
     var.raster = raster::stackApply(rstack, fun = var, indices = 1)
