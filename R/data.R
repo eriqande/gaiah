@@ -105,19 +105,36 @@ get_wrld_simpl <- function() {
 
 
 
-#' raster brick showing the 6 genetic regions that Wilson's warblers may be assigned to
+#' RasterStack showing the 6 genetic regions that Wilson's warblers may be assigned to
 #'
-#' @format RasterBrick. With 6 layers. Each contains 1's in the genetic region and 0's elsewhere.
+#' The sum over layers gives the same as \code{\link{wiwa_breed}}
+#' @format RasterStack with 6 layers. Each contains 1's in the genetic region and 0's elsewhere.
 #' The sum of these layers is the raster \code{\link{wiwa_breed}}.
 #' \describe{
-#' \item{class}{ RasterBrick }
+#' \item{class}{ RasterStack }
 #' \item{dimensions}{ 80, 228, 18240, 6  (nrow, ncol, ncell, nlayers)}
 #' \item{resolution}{ 0.5, 0.5  (x, y)}
 #' \item{extent}{ -168.1, -54.1, 31.2, 71.2  (xmin, xmax, ymin, ymax)}
 #' \item{coord. ref.}{ +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0 }
-#' \item{data source}{ Combine-Genetics/data/RegionBrick.grd }
+#' \item{data source}{in memory}
 #' \item{names}{ CalSierra, Basin.Rockies, Eastern, AK.EastBC.AB, Wa.To.NorCalCoast, CentCalCoast }
 #' }
 #'
 #' @source Ruegg et al 2014
 "genetic_regions"
+
+
+#' RasterLayer showing the MaxEnt habitat suitability model unclipped by the known breeding range
+#'
+#' \describe{
+#' \item{class}{ RasterLayer }
+#' \item{dimensions}{ 80, 228, 18240, 6  (nrow, ncol, ncell, nlayers)}
+#' \item{resolution}{ 0.5, 0.5  (x, y)}
+#' \item{extent}{ -168.1, -54.1, 31.2, 71.2  (xmin, xmax, ymin, ymax)}
+#' \item{coord. ref.}{ +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0 }
+#' \item{data source}{in memory}
+#' \item{values}{0, 0.001093349  (min, max)}
+#' }
+#'
+#' @source Ryan Harrigan
+"wiwa_habitat_unclipped"
