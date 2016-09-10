@@ -65,7 +65,7 @@ isotope_posterior_probs <- function(isoscape,
         dplyr::filter(ID != bird)
 
       # compute the rescaling parameters for bird
-      ass_pars <- gaiah:::.private_recale(loo_birds, isoscape_prediction, isoscape_std_err)
+      ass_pars <- gaiah:::.private_rescale(loo_birds, isoscape_prediction, isoscape_std_err)
 
       # now do the assignment
       bird_ass <- gaiah::vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
@@ -104,7 +104,7 @@ isotope_posterior_probs <- function(isoscape,
 #' have been attached to it.
 #' @param pred  The raster of isoscape predictions
 #' @param std The raster of isoscape standard deviations
-.private_recale <- function(birds, pred, std) {
+.private_rescale <- function(birds, pred, std) {
 
     # remove locations that have only one bird in them
     birds_tossed <- birds %>%

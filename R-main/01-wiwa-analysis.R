@@ -39,6 +39,7 @@ Miso <- lapply(isotope_ref_bird_results$loo_results, function(y) {
 
 
 
+
 #### Get the genetic posteriors and then make the genetic posterior rasters  ####
 # breeding_wiwa_genetic_posteriors  # here is a long format data frame of assignment posteriors to region
 
@@ -73,10 +74,12 @@ Mgen <- genetic_posteriors2rasters(breeding_wiwa_genetic_posteriors, genetic_reg
 
 
 
+
 #### Load up Mhab  ####
 Mhab <- wiwa_habitat_unclipped * wiwa_breed  # make sure to clip it with the known breeding range.
 
 Mhab_norm <- Mhab / raster::cellStats(Mhab, stat = sum)  # and for later analyses, treat these as posterior probs
+
 
 
 #### Now, some bookkeeping.  ####
@@ -142,6 +145,7 @@ Mgen <- raster::stack(Mgen)
 
 
 
+
 #### Here is a simple plotting tool and I will quickly make a bunch of plots ####
 # bird is the Short_Name of the bird
 quickie_plots <- function(bird, Miso, Mgen, Mhab, kbirds) {
@@ -167,6 +171,8 @@ for(i in 1:ncol(bird_name_mat)) {
   dev.off()
   message(paste("Done with", i))
 }
+
+
 
 
 
@@ -231,3 +237,19 @@ ggplot(dist_df, aes(x = gc_gen, y = gc_iso, color = region)) +
   geom_point() +
   facet_wrap(~ region, ncol = 3) +
   geom_abline(slope = 1, intercept = 0)
+
+# ultimately, I think that violin plots might make the most sense
+ggplot(dist_tidy, aes(y = post_mean_gc_dist, x =  data_type, fill = data_type)) +
+  geom_violin() +
+  facet_wrap(~ region) +
+  coord_flip()
+
+
+
+#### Combining iso, hab, and genetics.
+# I think this is going to be easiest if we have everything be a raster Stack, so make a rasterStack of Mhab
+Mhab_stack <- raster::stack(lapply(1:nlayers(Miso), function(x) Mhab))
+
+# holy crap! this is easy and quick
+tmp  <- Miso * Mhab_stack * Mgen
+Mcombo <- tmp / cellStats(tmp, sum)
