@@ -1,0 +1,474 @@
+---
+title: "WIWA gaiah analysis"
+author: "Eric C. Anderson"
+date: "June 1, 2016"
+output: 
+  html_notebook: 
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preliminaries
+First we will load all the libraries that we need.
+```{r libs}
+library(raster)  # call this before dplyr so it doesn't mask select
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(gaiah)
+library(parallel)
+```
+And after that we have a block where we define variables that tell us whether to recompute values
+from scratch or to use a few cached ones.
+```{r poor-mans-cache}
+COMPUTE_ISO_POSTERIORS <- FALSE
+```
+
+
+## Prepare all the rasters
+Just some machinations to get `Mgen`, `Miso`, and `Mhab`.
+
+### Computing isotope posteriors
+
+First we compute all the isotope-based posterior surfaces for each reference bird using
+a Leave-one-out procedure. This defines `Miso`.
+```{r get-iso-posteriors}
+
+ref_birds <- breeding_wiwa_isotopes
+
+if(COMPUTE_ISO_POSTERIORS == TRUE) {
+  isotope_ref_bird_results <- isotope_posterior_probs(isoscape = isomap_job54152_prediction,
+                                                    ref_birds = ref_birds,
+                                                    isoscape_pred_column = "predkrig",
+                                                    isoscape_sd_column = "stdkrig",
+                                                    self_assign = TRUE)
+
+  #save(isotope_ref_bird_results, file = "outputs/isotope_ref_bird_results.rda", compress = "xz")
+} else {
+  load("../outputs/isotope_ref_bird_results.rda")
+}
+
+# clip the isotope posteriors to the known breeding range and normalize again
+# I should rewrite the function to do this if we have the breeding range...maybe...
+# also, at this point I am going to get a simple list of rasters
+Miso <- lapply(isotope_ref_bird_results$loo_results, function(y) {
+  x <- y$posterior_probs
+  x * wiwa_breed / raster::cellStats(x * wiwa_breed, sum)
+})
+```
+
+### Get and process the genetics posteriors
+We have the posteriors to each of the genetic groups for each of the birds.  We are going to take those
+and then smear them over the geographic extent of the each genetic group for each bird.  This defines `Mgen`.
+```{r process-genetics}
+Mgen <- genetic_posteriors2rasters(breeding_wiwa_genetic_posteriors, genetic_regions)  # this takes about 25 seconds
+```
+
+### Load up the habitat quality raster
+This is part of the `gaiah` package.  We get it and then we clip it to the breeding range and 
+make a version that is normalized.  This makes `Mhab` and `Mhab_norm`.  For most dowstream analyses
+we are going to want to use `Mhab_norm`.
+```{r get-hab-stuff}
+Mhab <- wiwa_habitat_unclipped * wiwa_breed  # make sure to clip it with the known breeding range.
+
+Mhab_norm <- Mhab / raster::cellStats(Mhab, stat = sum)  # and for later analyses, treat these as posterior probs
+
+```
+
+### Finally some fiddly bookeeping
+Here we only keep birds that have both isotope and genetic data.  The result of this is `kbirds`, our 
+master data frame of the birds that we will be using here.
+We also have to keep track of which groups these birds are in so we end up using the short population
+names and fiddling with that here.  Also we turn `Miso` and `Mgen` into `rasterStacks`. 
+```{r bookeep, message=FALSE}
+# I want to retain only the birds that appear both in Mgen and Miso, and I
+# want to order them so that they are all together from different locations
+keepers <- intersect(names(Miso), names(Mgen))
+
+# here we input the genetic regions for those short pops.  I get these from the repunits
+# file from the wiwa-popgen repo.  Ultimately I will want to have these with the data from the get-go
+spr <- read.table(textConnection("ShortPop  region
+                                 wAKDE AK.EastBC.AB
+                                 wAKYA AK.EastBC.AB
+                                 wAKUG AK.EastBC.AB
+                                 wAKJU AK.EastBC.AB
+                                 wABCA AK.EastBC.AB
+                                 wBCMH AK.EastBC.AB
+                                 wWADA Wa.To.NorCalCoast
+                                 wORHA Wa.To.NorCalCoast
+                                 wORMB Wa.To.NorCalCoast
+                                 wCAEU Wa.To.NorCalCoast
+                                 wCAHM CentCalCoast
+                                 wCABS CentCalCoast
+                                 wCASL CentCalCoast
+                                 wCATE CalSierra
+                                 wCACL CalSierra
+                                 wCAHU CalSierra
+                                 wMTHM Basin.Rockies
+                                 wOREL Basin.Rockies
+                                 wCOPP Basin.Rockies
+                                 wCOGM Basin.Rockies
+                                 eQCCM Eastern
+                                 eONHI Eastern
+                                 eNBFR Eastern
+                                 "), header = TRUE, stringsAsFactors = FALSE)
+
+
+
+
+kbirds <- ref_birds %>%
+  filter(ID %in% keepers) %>%  # the names got mangled so I have to do this
+  mutate(ShortPop = str_replace_all(Short_Name, "[0-9]", "")) %>%
+  left_join(spr) %>%
+  arrange(region, ShortPop, Short_Name) %>%
+  dplyr::select(ID, region, ShortPop, Short_Name, lat, long, everything())
+
+
+# Now, I think that it is just going to be better to use the Short_Names for all of these
+# (at least it will be easier to think about and check everything).  So do the following:
+Miso <- Miso[kbirds$ID]
+names(Miso) <- kbirds$Short_Name
+
+Mgen <- Mgen[kbirds$ID]
+names(Mgen) <- kbirds$Short_Name
+
+# and, in fact, it will be nice to make these RasterStacks, now that they are in the right
+# order
+Miso <- raster::stack(Miso)
+Mgen <- raster::stack(Mgen)
+
+
+```
+
+
+## Play around with combinging data types
+This is just to have a quick look at what happens when we combine data types.  Here we just use equal weighting.
+```{r quick-combine}
+Combo <- comboize(Mgen, Miso, Mhab_norm, 1, 1, 1)
+```
+
+Then plot those at the first bird to see what they look like
+```{r quick-combo-plot}
+par(mfrow = c(2,2))
+plot(Mgen[[100]], main = "Gen")
+plot(Miso[[100]], main = "Iso")
+plot(Mhab_norm, main = "Hab")
+plot(Combo[[100]], main = "Combo")
+```
+
+## Computing min-hpd-areas
+We can compute all the min-hpd-areas like this
+```{r min-hpd-all-birds-11}
+mhia <- min_hpd_inc_area_df(kbirds, Combo)
+```
+But what we really would like to do is compute those values for different betas. I am going to fix beta_gen at 1 and then explore 
+a few different values for the others.  This is set to not recompute at the moment.  Just get the stored results
+```{r areas-by-beta, eval=FALSE}
+griddy <- c(0, 0.33, 0.66, 1.0, 1.33, 1.66, 2.0, 2.5)
+names(griddy) <- griddy
+
+out <- mclapply(c("1.0" = 1.0), function(bgen) {
+  mclapply(griddy, function(biso) {
+    mclapply(griddy, function(bhab) {
+      print(c(bgen, biso, bhab))
+      min_hpd_inc_area_df(kbirds, comboize(Mgen, Miso, Mhab_norm, beta_gen = bgen, beta_iso = biso, beta_hab = bhab))$area
+    }) %>% 
+      bind_rows(.id = "beta_hab")
+  }) %>%
+    bind_rows(.id = "beta_iso")
+}) %>% bind_rows(.id = "beta_gen")
+
+saveRDS(out, file = "64_vals.rds", compress = "xz")
+```
+
+```{r get-stored-results}
+out <- readRDS(file = "64_vals.rds")
+```
+Then have a look at that over the different regions.
+```{r quick-summary-of-areas}
+region_means <- kbirds %>%
+  select(region, Short_Name) %>%
+  left_join(., out) %>%
+  group_by(region, beta_gen, beta_iso, beta_hab) %>%
+  summarize(mean_area = mean(min_hpd_area), 
+            trimmed10_mean_area = mean(min_hpd_area, trim = 0.10)) %>%
+  ungroup() %>% arrange(region, mean_area)
+```
+And now we will want to make some plots that show the influence of the exponent:
+Here it is using all of the data:
+```{r investigate-exponents1, fig.width=15, fig.height=10}
+ggplot(region_means, aes(x = beta_hab, y = mean_area, colour = factor(beta_iso), group = factor(beta_iso))) +
+  geom_point() + 
+  geom_line() +
+  facet_wrap(~ region, scales = "free")
+  
+```
+
+Here it is using a trimmed mean with the middle 80% of the observations.
+```{r investigate-exponents2, fig.width=15, fig.height=10}
+ggplot(region_means, aes(x = beta_hab, y = trimmed10_mean_area, colour = factor(beta_iso), group = factor(beta_iso))) +
+  geom_point() + 
+  geom_line() +
+  facet_wrap(~ region, scales = "free")
+  
+```
+
+### Gonna look at some plots for individuals
+I want to plot individual min-hpd-areas.  I think that I should take Mhab as the "base"
+case.  And then I should see what happens when you add either genetics or isotopes.
+```{r proc-out}
+out2 <- kbirds %>%
+  select(region, Short_Name) %>%
+  left_join(., out)
+
+hab_only <- out2 %>%
+  filter(beta_iso == 0, beta_gen == 0, beta_hab == 1)
+hab_iso <- out2 %>% filter(beta_hab == 1, beta_iso == 1, beta_gen == 0)
+hab_gen <- out2 %>% filter(beta_hab == 1, beta_iso == 0, beta_gen == 1)
+gen_iso <- out2 %>% filter(beta_hab == 0, beta_iso == 1, beta_gen == 1)
+hab_gen_iso <- out2 %>% filter(beta_hab == 1, beta_iso == 1, beta_gen == 1)
+
+tmp <- list(hab_only = hab_only, hab_iso = hab_iso, hab_gen = hab_gen, gen_iso = gen_iso, hab_gen_iso = hab_gen_iso) %>%
+  bind_rows(.id = "info_type") %>%
+  select(-contains("beta")) %>%
+  tidyr::spread(., key = info_type, value = min_hpd_area)
+
+ggplot(tmp, aes(x = hab_iso, y = hab_gen, colour = region)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  facet_wrap(~ region)
+
+
+ggplot(tmp, aes(x = gen_iso, y = hab_gen_iso, colour = region)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  facet_wrap(~ region)
+```
+
+
+
+## Make some plots
+We want some plots that show the posteriors and the true locations of the reference birds.
+First define a function, `quickie_plots` that makes large pages of plots.  We won't evaluate this
+but you can see the results in ``outputs` from previous runs.
+```{r plot-func, eval = FALSE}
+# bird is the Short_Name of the bird
+quickie_plots <- function(bird, Miso, Mgen, Mhab, kbirds) {
+  lat <- kbirds$lat[kbirds$Short_Name == bird]
+  long <- kbirds$long[kbirds$Short_Name == bird]
+  reg <- kbirds$region[kbirds$Short_Name == bird]
+
+  plot(Mgen[[bird]],  main = paste("Genetics:", bird, reg))
+  points(long, lat, pch = 18, col = 'red', cex = 1.5)
+
+  plot(Miso[[bird]],  main = paste("Isotopes:", bird, reg))
+  points(long, lat, pch = 18, col = 'red', cex = 1.5)
+
+  plot(Mhab,  main = paste("Habitat:", bird, reg))
+  points(long, lat, pch = 18, col = 'red', cex = 1.5)
+}
+
+bird_name_mat <- matrix(kbirds$Short_Name, nrow = 36)
+for(i in 1:ncol(bird_name_mat)) {
+  pdf(file = paste("outputs/known_origin_raster_", i, ".pdf", sep = ""), height = 162, width = 11)
+  par(mfrow = c(36,3))
+  lapply(bird_name_mat[, i], function(x) quickie_plots(x, Miso, Mgen, Mhab, kbirds))
+  dev.off()
+  message(paste("Done with", i))
+}
+
+```
+
+
+## Computation of great circle distances and posterior means of GC distances
+First, we make a `rasterStack` that gives the great circle distance between each reference birds true
+location and every cell in the raster. This makes the rasterStack, `GCD`.
+```{r gcd-comp}
+GCD <- lapply(1:nrow(kbirds), function(i)
+    great_circle_raster(wiwa_breed, kbirds$lat[i], kbirds$long[i])
+  )
+names(GCD) <- kbirds$Short_Name
+
+GCD <- raster::stack(GCD)
+
+```
+And now, using that we can compute the posterior mean great circle distances between then inferred
+origins and the true sampling location. We do this for genetics, isotopes, and habitat, and we
+add those posterior mean distances to `kbirds`
+```{r post-mean-gc}
+genpmgc <- raster::cellStats(Mgen * GCD, stat = sum)
+isopmgc <- raster::cellStats(Miso * GCD, stat = sum)
+habpmgc <- cellStats(GCD * Mhab_norm, stat = sum)
+names(habpmgc) <- names(GCD)
+
+# and just quickly, let us add that to our kbirds data frame
+dist_df <- kbirds
+dist_df$gc_iso <- isopmgc[dist_df$Short_Name]
+dist_df$gc_gen <- genpmgc[dist_df$Short_Name]
+dist_df$gc_hab <- habpmgc[dist_df$Short_Name]
+```
+
+## Summarise posterior mean GC distances
+We can make some violin plots to show how the different methods do on birds from different known
+locations.
+```{r gc-violins, fig.width=5, fig.height=4}
+# put it into long format
+dist_tidy <- dist_df %>%
+  tidyr::gather(., key = "data_type", value = "post_mean_gc_dist", gc_iso:gc_hab)
+
+ggplot(dist_tidy, aes(y = post_mean_gc_dist, x =  data_type, fill = data_type)) +
+  geom_violin() +
+  facet_wrap(~ region) +
+  coord_flip()
+```
+
+
+
+### Exploring the space of $\beta_\mathrm{iso}$ and $\beta_\mathrm{hab}$
+For each value of pair of values of $\beta_\mathrm{iso}$ and $\beta_\mathrm{hab}$ between 0 and 1 (or maybe
+1.5 if it will be better to crank them up more) I want to see what the mean of the posterior mean 
+great circle distances are for each of the different groups.  We will be able to plot this is a contour.
+So, first get a function that takes the two beta values and returns a data frame of the resulting 
+mean posterior great circle values.
+```{r beta-gc-func}
+gcpms_from_betas <- function(biso = 1, bhab = 1) {
+  Mcombo <- comboize(biso, bhab)
+  pmgc <- cellStats(GCD * Mcombo, stat = sum)
+  data_frame(Short_Name = names(pmgc), beta_iso = biso, beta_hab = bhab, pmgc = pmgc) %>%
+    left_join(kbirds %>% select(region, Short_Name), .)
+}
+```
+And then we just lapply over a bunch of beta values and bind all the rows together in the end. But don't evaluate this.  Takes too long.
+```{r explore-betas, eval=FALSE}
+big_beta_frame <- lapply(seq(0, 1.5, by = 0.1), function(i) {
+  lapply(seq(0, 1.5, by = 0.1), function(h) {
+    print(c(i, h))
+    gcpms_from_betas(i, h)
+  }) %>% bind_rows()
+}) %>% bind_rows()
+```
+And now we will summarise those into means for each region and make a contour plot of it.
+```{r plot-beta-results, eval = FALSE}
+bbsum <- big_beta_frame %>% 
+  group_by(region, beta_iso, beta_hab) %>%
+  summarise(mean_pmgc_dist = mean(pmgc))
+
+ggplot(bbsum, aes(x = beta_iso, y = beta_hab, z = mean_pmgc_dist)) +
+  geom_contour() +
+  facet_wrap(~ region)
+```
+That is kind of grim.  It just keeps getting smaller and smaller as you pump up the exponent there.
+
+
+## Exploring a different accuracy measure
+
+We might be able to do something with the the inclusion status (and the sizes) of different HPD credible
+intervals.  In order to do this we will want to have a function that takes a posterior probability raster
+and then computes the cumulative posterior prob at each cell given that they are sorted in descending order
+of posterior probability.
+```{r hpd-cumul-func}
+#' finds the cumulative posterior probability of each cell for HPD calculation
+#'
+#' @param B a raster of posterior probs
+hpd_cumul <- function(B) {
+  ord <- order(values(B), decreasing = TRUE, na.last = TRUE)
+  cumul = cumsum(values(B)[ord])
+  values(B)[ord] <- cumul
+  B
+}
+```
+See how this works, now.  Here are the cumulative values:
+```{r show-cumul}
+Mcombo <- comboize(1.0, 1.0)
+plot(hpd_cumul(Mcombo[[1]]))
+```
+If we want to find the 50% HPD credible region we can do like this.
+
+```{r show-hpd-use}
+plot(hpd_cumul(Mcombo[[1]]) < 0.5 )
+```
+and if we wanted to, for instance find the area of the 50% HPD credible interval, we would di this:
+```{r area-of-hpd-ci}
+cellStats((hpd_cumul(Mcombo[[1]]) < 0.5) * area(Mcombo[[1]]), stat = sum)
+```
+(holy moly! 1.3 million square kilometers of uncertainty)! and we can use extract to figure out what cumulative HPD level the true sampling location was.  And from that
+we could look at how the area of the HPD (and whether it overlapped or not), for each individual. That might be an interesting measure---how large (in terms of area) must the HPD be in order to include the correct location, and we
+could show that for every single bird as a point.  Interesting...could be a scatter plot with say isotopes on the x-axis
+and genetics on the y. Or Mcombo on the x axis and something else on the y.  The error measure here is then essentially the
+"area of uncertainty".
+
+Let's just try that simply
+```{r, hpd-inclusion-area-function}
+#' compute the smallest area of an HPD credible set that includes the true bird location
+#'
+#' This function computes the area of the HPD credible set that is as small as possible
+#' but just barely includes the cell with the true location (or, if the true location is not
+#' actually inluded in the range map, we use the closest cell on the range map to the true
+#' location)
+#' @param M the posterior surface matrix
+#' @param lat the true latitude
+#' @param long the true longitude
+min_hpd_inclusion_area <- function(M, lat, long) {
+  hpc <- hpd_cumul(M)
+  gcd <- great_circle_raster(M, lat, long)
+  
+  # here are the distances from the point to non-NA cells
+  dd <- gcd * (hpc > 0)
+  
+  # here is the minimum distance to a nonNA cell
+  mindist <- cellStats(dd, min, na.rm = TRUE)
+  
+  # here is a mask that picks out the closest cell(s)
+  cc <- abs(dd - mindist) < 10-8  # don't test equality of numerics...
+  
+  # here is the hpd value at that point
+  hpd_at_ll <- cellStats(cc * hpc, sum, na.rm = TRUE) / cellStats(cc, sum, na.rm = TRUE)
+  
+  # now, get the area of the hpd_at_ll  HPD CI
+  hpc_area <- cellStats( (hpc < (hpd_at_ll + 1e-9)) * area(hpc), stat = sum, na.rm = TRUE)
+  
+  # return both the cumulative prob and the cumulative HPD area
+  list(area = hpc_area, cumul_prob = hpd_at_ll)
+}
+```
+
+Now that we have that defined, let's see if we can add it to kbirds
+```{r compute-hpd-area}
+Mcombo1_1 <- comboize(1.0, 1.0)  # just go for the equal weighting
+lats <- kbirds$lat
+longs <- kbirds$long
+names(lats) <- kbirds$Short_Name
+names(longs) <- kbirds$Short_Name
+birds <- kbirds$Short_Name
+names(birds) <- birds
+
+hpd_areas_1_1 <- unlist(lapply(birds, function(b) {min_hpd_inclusion_area(Mcombo1_1[[b]], lats[b], longs[b])$area}))
+
+hpd_areas_iso <- unlist(lapply(birds, function(b) {min_hpd_inclusion_area(Miso[[b]], lats[b], longs[b])$area}))
+
+hpd_areas_hab <- unlist(lapply(birds, function(b) {min_hpd_inclusion_area(Mhab, lats[b], longs[b])$area}))
+
+Mgen_iso <- comboize(1.0, 0.0)
+hpd_areas_gen_iso <- unlist(lapply(birds, function(b) {min_hpd_inclusion_area(Mgen_iso[[b]], lats[b], longs[b])$area}))
+
+Mgen_hab <- comboize(0.0, 1.0)
+hpd_areas_gen_hab <- unlist(lapply(birds, function(b) {min_hpd_inclusion_area(Mgen_hab[[b]], lats[b], longs[b])$area}))
+
+kb_areas <- data_frame(hpd_areas_1_1, hpd_areas_iso, hpd_areas_hab, hpd_areas_gen_iso, hpd_areas_gen_hab) %>%
+  setNames(c("hpd_areas_1_1", "hpd_areas_iso", "hpd_areas_hab", "hpd_areas_gen_iso", "hpd_areas_gen_hab")) %>%
+  bind_cols(kbirds, .)
+
+```
+
+Now we can plot those things.  How about some scatters?
+```{r plot-areas}
+ggplot(kb_areas, aes(x = hpd_areas_1_1, y = hpd_areas_gen_iso, colour = region)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  facet_wrap(~ region, ncol = 2, scales = "free") 
+```
+
+
