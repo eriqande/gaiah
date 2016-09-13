@@ -173,8 +173,6 @@ for(i in 1:nlayers(Mgen)) {
   ggsave(filename = paste("plots/bird_", names(Mgen)[i], ".pdf", sep = ""), height = 3, width = 19)
   
   print(i);
-  print(the_lat);
-  print(the_long);
 }
 ```
 
