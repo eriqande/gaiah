@@ -30,6 +30,12 @@ isotope_posterior_probs <- function(isoscape,
                                     self_assign = FALSE
 ) {
 
+  if(is.null(assign_birds) && self_assign == FALSE) stop("self_assign cannot be FALSE without passing in a data frame of assign_birds")
+
+  # set some defaults
+  loo_ass <- NULL
+  regular <- NULL
+
   # some stuff to evaluate while testing/developing
   if(FALSE) {
     isoscape <- isomap_job54152_prediction
@@ -81,11 +87,39 @@ isotope_posterior_probs <- function(isoscape,
         assignment_parameters = ass_pars
       )
     })
+  }  else {  # if we aren't doing leave one out then we just compute the rescaling for the ref birds all together and there is no LOO
+    birds_vec <- assign_birds$ID
+    names(birds_vec) <- birds_vec
+
+    # compute the rescaling parameters from all the ref birds
+    ass_pars <- gaiah:::.private_rescale(ref_birds_with_isoscape_vals, isoscape_prediction, isoscape_std_err)
+
+    # then lapply over the birds and assign them
+    globN <<- 0
+    ret <- lapply(birds_vec, function(bird) {
+      globN <<- globN + 1
+      message("Doing (NOT-leave-one-out) isotope procedure for individual ", bird, ". Number ", globN, " of ", length(birds_vec))
+
+      # now do the assignment
+      bird_ass <- gaiah::vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
+                                    rescale_var = ass_pars$R_sigma_squared,
+                                    precip_sd = isoscape_std_err,
+                                    sd_indiv = ass_pars$sd_indiv,
+                                    bird_iso = assign_birds$Isotope.Value[assign_birds$ID == bird]
+      )
+
+      # now return the assignment parameters and also the posterior prob
+      list(
+        posterior_probs = bird_ass,
+        assignment_parameters = ass_pars
+      )
+    })
   }
 
   # later on we will return other thigns in this list too.
   list(
-    loo_results = loo_ass
+    loo_results = loo_ass,
+    regular = ret
   )
 }
 

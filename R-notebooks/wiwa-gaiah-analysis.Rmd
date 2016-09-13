@@ -150,13 +150,32 @@ This is just to have a quick look at what happens when we combine data types.  H
 Combo <- comboize(Mgen, Miso, Mhab_norm, 1, 1, 1)
 ```
 
-Then plot those at the first bird to see what they look like
-```{r quick-combo-plot}
-par(mfrow = c(2,2))
-plot(Mgen[[100]], main = "Gen")
-plot(Miso[[100]], main = "Iso")
-plot(Mhab_norm, main = "Hab")
-plot(Combo[[100]], main = "Combo")
+Then plot those at all the birds to see what they look like
+```{r multi-combo-plot}
+wmap <- get_wrld_simpl()
+dir.create("plots")
+for(i in 1:nlayers(Mgen)) {
+  tmp <- comboize_and_fortify(Mgen[[i]], Miso[[i]], Mhab, iso_beta_levels = 1, hab_beta_levels = 1)
+  
+  latlong <- kbirds %>% filter(Short_Name == names(Mgen)[i])
+  
+  
+  g <- ggplot(mapping = aes(x=long, y = lat)) +
+    coord_fixed(1.3, xlim = c(-170, -50), ylim = c(33, 70)) +
+    geom_polygon(data = wmap, aes(group = group), fill = NA, color = "black", size = .05) +
+    geom_raster(data = tmp, mapping = aes(fill = prob), interpolate = TRUE) +
+    scale_fill_gradientn(colours = c("#EBEBEB", rainbow(7)), na.value = NA) +
+    theme_bw() +
+    facet_wrap(~ beta_vals, ncol = 4) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+    geom_point(data = latlong, mapping = aes(x = long, y = lat), shape = 13, size = 2.5)
+  
+  ggsave(filename = paste("plots/bird_", names(Mgen)[i], ".pdf", sep = ""), height = 3, width = 19)
+  
+  print(i);
+  print(the_lat);
+  print(the_long);
+}
 ```
 
 ## Computing min-hpd-areas
@@ -282,6 +301,92 @@ for(i in 1:ncol(bird_name_mat)) {
 
 ```
 
+
+## Doing Some Migrants
+I want to get in and do some of the migrants here.  So, here we go
+
+### Migrant Isotopes and Genetics
+We make the genetics and isotope rasters in the same way:
+```{r mig-gen-rast}
+# these are for all the migrants kristen had in the first paper
+MigGenAll <- genetic_posteriors2rasters(migrant_wiwa_genetic_posteriors, genetic_regions)  # this takes a minute or so
+
+# these are just the Arizona birds that Kristina Sampled
+MigIsoAll <-  isotope_posterior_probs(isoscape = isomap_job54152_prediction,
+                                   ref_birds = ref_birds,
+                                   assign_birds = migrant_wiwa_isotopes,
+                                   isoscape_pred_column = "predkrig",
+                                   isoscape_sd_column = "stdkrig",
+                                   self_assign = FALSE)
+
+# and from those we need to get just the posterior probs, and clip them by the breeding range
+MigIso <- lapply(MigIsoAll$regular, function(y) {
+  x <- y$posterior_probs
+  x * wiwa_breed / raster::cellStats(x * wiwa_breed, sum)
+})
+
+# now, focus just on the Mig birds that we have data for and get everyone in the correct order
+# and make stacks of them
+MigBirds <- intersect(names(MigIso), names(MigGenAll))
+MigGen <- MigGenAll[MigBirds] %>% raster::stack()
+MigIso <- MigIso[MigBirds] %>% raster::stack()
+
+# and then comboize them
+MigCombo <- comboize(MigGen, MigIso, Mhab_norm, 1, 1, 1)  # We will just use 1,1 as the exponents for now.
+```
+Now we want to identify where they seem to be headed, on the basis of genetics
+```{r mig-combine}
+mig_gen_assignments <- migrant_wiwa_genetic_posteriors %>% 
+  filter(ID %in% MigBirds) %>%
+  group_by(ID) %>% 
+  arrange(desc(posterior)) %>%
+  summarise(ass_reg = first(region, order_by = desc(posterior)),
+            maxpost = first(posterior, order_by = desc(posterior)))
+
+```
+
+### Now compute the posterior mean remaining migration distance
+And see how that relates to the date it comes through.  We will do this as a simple great circle calculation.
+
+First, we make a raster stack (just a bunch of copies) of the great circle distance between
+Cibola and every cell in the raster, and then weight those by posteriors of breeding origin
+and sum them to get the posterior mean migration distance remaining.
+```{r  gcd-cibola}
+# the lat and long are the same for all those birds:
+tmp <- migrant_wiwa_isotopes %>% group_by(lat, long) %>% tally()
+ciblat <- tmp$lat[1]
+ciblong <- tmp$long[1]
+MigDistStack <- lapply(1:nlayers(MigCombo), function(x) great_circle_raster(wiwa_breed, ciblat, ciblong)) %>%
+  setNames(names(MigCombo)) %>%
+  raster::stack()
+
+MigDistMeans <- raster::cellStats(MigCombo * MigDistStack, stat = sum)
+
+# make a data frame of that, and add the assignments and the collection dates on there
+mig_dist_df <- data_frame(ID = names(MigDistMeans), dist = MigDistMeans) %>%
+  left_join(mig_gen_assignments) %>%
+  left_join(migrant_wiwa_genetic_posteriors %>% group_by(ID) %>% summarise(collect_date = min(Collection_Date))) %>%
+  mutate(collect_date = lubridate::dmy(collect_date),
+         year = lubridate::year(collect_date),
+         yearday = lubridate::yday(collect_date))
+```
+
+Now, let's make a plot of collection date versus remaining distance
+```{r colldate-v-dist}
+ggplot(mig_dist_df, aes(x = yearday, y = dist, colour = ass_reg)) +
+  facet_wrap(~ year) +
+  geom_point()
+```
+
+There is not much signal in the AK birds there.  Let's focus just on the Northern Cali / WA birds
+```{r colldate-v-dist-WA}
+ggplot(mig_dist_df %>% filter(ass_reg == "Wa.To.NorCalCoast"), aes(x = yearday, y = dist)) +
+  facet_wrap(~ year) +
+  geom_point(colour = "darkgreen") +
+  geom_smooth()
+```
+That shows a little bit of a signal there---probably the difference between northern CA and WA...maybe...
+or maybe not...
 
 ## Computation of great circle distances and posterior means of GC distances
 First, we make a `rasterStack` that gives the great circle distance between each reference birds true

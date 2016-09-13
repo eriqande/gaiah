@@ -21,6 +21,24 @@
 
 
 
+#' Isotope values, latitude, longitude and more data from 357 breeding Wilson's warblers
+#'
+#' A data frame containing hydrogen isotope values, lat, long, and IDs and some other
+#' columns of data for birds sampled during migration from Arizona.
+#' @format A tbl_df-ed (from dplyr) data frame with 688 rows and 14 variables. The relevant variables for
+#' analyses here are:
+#' \describe{
+#'   \item{ID}{unique identifier for each bird}
+#'   \item{Isotope.Value}{hydrogen isotope ratios measured in the bird's feather}
+#' }
+#' @source Kristina Paxton
+"migrant_wiwa_isotopes"
+
+
+
+
+
+
 #' Posterior probs of genetic region origin from Leave-one-out cross validation for breeding WIWAs
 #'
 #' A data frame of the same birds (roughly) that appear in \code{\link{breeding_wiwa_isotopes}}.  A long
@@ -37,6 +55,28 @@
 #' }
 #' @source Kristen Ruegg, Eric Anderson, Thomas Smith
 "breeding_wiwa_genetic_posteriors"
+
+
+
+
+#' Posterior probs of genetic region of origin for 926 WIWAs sampled during migration
+#'
+#'  A long
+#' format data frame with 5,556 rows and 6 columns
+#'
+#' @format A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
+#' analyses here are:
+#' \describe{
+#'   \item{ID}{unique identifier for each bird}
+#'   \item{Short_Name}{same id for the bird}
+#'   \item{Collection_Date} The date the bird was sampled.
+#'   \item{NumberOfLoci}{Number of loci successfully typed}
+#'   \item{region}{one of the genetic regions}
+#'   \item{posterior}{the posterior prob of originating from that region}
+#' }
+#' @source Kristina Paxton, Kristen Ruegg, Eric Anderson, Thomas Smith
+"migrant_wiwa_genetic_posteriors"
+
 
 
 
