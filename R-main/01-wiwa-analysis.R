@@ -10,7 +10,7 @@ library(ggplot2)
 library(gaiah)
 library(forcats)
 
-
+dir.create("outputs")
 
 #### CHOOSE WHETHER TO USE PRE-STORED VALUES OR RECOMPUTE THINGS####
 COMPUTE_ISO_POSTERIORS <- FALSE  # if false then it will just load these up from a cache
