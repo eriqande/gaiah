@@ -2,3 +2,11 @@
 .Rhistory
 .RData
 .DS_Store
+
+
+*.log
+*.aux
+*.pdfsync
+*.synctex.gz
+body_supp1.tex
+suppl1.pdf
