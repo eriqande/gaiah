@@ -9,7 +9,7 @@ analyses here are:
 \describe{
   \item{ID}{unique identifier for each bird}
   \item{Short_Name}{same id for the bird}
-  \item{Collection_Date} The date the bird was sampled.
+  \item{Collection_Date}{The date the bird was sampled.}
   \item{NumberOfLoci}{Number of loci successfully typed}
   \item{region}{one of the genetic regions}
   \item{posterior}{the posterior prob of originating from that region}
