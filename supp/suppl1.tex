@@ -1,0 +1,85 @@
+\documentclass[11pt,landscape]{article}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{amsfonts}
+\usepackage{natbib}
+\usepackage{subfigure}
+\usepackage{pdfsync}
+\usepackage{xspace}
+%\usepackage[pdftex, colorlinks=true,urlcolor=blue]{hyperref}
+%\usepackage{wallpaper}
+
+%%%% HERE IS SOME WATERMARK STUFF
+%\addtolength{\wpXoffset}{-.2in}
+%\CenterWallPaper{1.1}{/Users/eriq/Documents/work/nonprj/WaterMarks/StrictDraftWatermark.eps}
+
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+
+
+%% some handy things for making bold math
+\def\bm#1{\mathpalette\bmstyle{#1}}
+\def\bmstyle#1#2{\mbox{\boldmath$#1#2$}}
+\newcommand{\thh}{^\mathrm{th}}
+
+
+%% Some pretty etc.'s, etc...
+\newcommand{\cf}{{\em cf.}\xspace }
+\newcommand{\eg}{{\em e.g.},\xspace }
+\newcommand{\ie}{{\em i.e.},\xspace }
+\newcommand{\etal}{{\em et al.}\ }
+\newcommand{\etc}{{\em etc.}\@\xspace}
+
+
+
+%% the page dimensions from TeXShop's default---very nice
+\textwidth = 9 in
+\textheight = 7.0 in
+\oddsidemargin = 0.0 in
+\evensidemargin = 0.0 in
+\topmargin = 0.0 in
+\headheight = 0.0 in
+\headsep = 0.0 in
+\footskip = -0.2 in
+\parskip = 0.2in
+\parindent = 0.0in
+
+
+\title{Supporting Information 1 for paper\\
+``Tracking Migratory Animal Origins Using \\
+Genetics, Isotopes, and Habitat Suitability''}
+\author{Kristen C. Ruegg \and  
+         Eric C. Anderson \and 
+         Kristina L. Paxton\and 
+         Ryan J. Harrigan \and
+         Jeff Kelly \and
+         Thomas B. Smith
+         }
+
+\begin{document}
+
+\maketitle
+
+
+This document contains supporting information for the paper, ``Tracking Migratory Animal Origins Using
+Genetics, Isotopes, and Habitat Suitability.''  Each page shows four rows of plots.  Each row corresponds
+to a single bird from the reference data set.  The bird's name and region of origin are given above each plot,
+along with a nearby town, the latitude and longitude, and the bird's $\delta^2\mathrm{H}$ reading.  
+
+Each row contains four plots. The first shows the prior probability of bird origin obtained from habitat suitability.
+The second shows the posterior probability of origin given only the genetic data (and a uniform prior).  
+The third shows the posterior probability of origin given only the isotope data (and a uniform prior).
+The fourth shows
+the posterior probability when both the genetics and the isotopes are used, and the habitat suitability is used as a prior.  
+
+The prior from habitat suitability is identical for every bird, but may appear different due to differences in scaling of the 
+colors used. A key appears at the right of every figure.
+\newpage
+
+\input{body_supp1.tex}
+
+\bibliography{anderson}
+\bibliographystyle{mychicago}
+ \end{document}
