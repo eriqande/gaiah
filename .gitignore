@@ -10,3 +10,6 @@
 *.synctex.gz
 body_supp1.tex
 suppl1.pdf
+outputs/figures
+outputs/birdmaps
+outputs/isotope_ref_bird_results.rda

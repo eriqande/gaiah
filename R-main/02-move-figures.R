@@ -19,3 +19,4 @@ system(call)
 
 #### THEN MOVE all the -crop.pdf things ####
 call <- paste("mv ", figinpath,  "/*-crop.pdf ", figoutpath, sep = "")
+system(call)
