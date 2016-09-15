@@ -49,7 +49,7 @@ comboize <- function(Mgen, Miso, Mhab, beta_gen, beta_iso, beta_hab) {
 #' @param iso_beta_levels
 #' @param hab_beta_levels
 #' @export
-comboize_and_fortify <- function(Mgen, Miso, Mhab,
+comboize_and_fortify <- function(mgen, miso, mhab,
                                  true_lat = NA, true_long = NA,
                                  gen_beta_levels = 1,
                                  iso_beta_levels = c(1.0),
@@ -63,8 +63,8 @@ comboize_and_fortify <- function(Mgen, Miso, Mhab,
   levs_ret <- lapply(gen_beta_levels, function(gbl) {
     lapply(iso_beta_levels, function(ibl) {
       lapply(hab_beta_levels, function(hbl) {
-        comboize(raster::stack(Mgen), raster::stack(Miso), Mhab, gbl, ibl, hbl) %>%
-        as.data.frame(., xy = TRUE, stringsAsFactors = FALSE) %>%
+        comboize(raster::stack(mgen), raster::stack(miso), mhab, gbl, ibl, hbl) %>%
+        raster::as.data.frame(., xy = TRUE, stringsAsFactors = FALSE) %>%
           setNames(c("long", "lat", "prob"))  %>%
           dplyr::tbl_df()
       }) %>% dplyr::bind_rows(.id = "habitat_beta")
@@ -79,11 +79,11 @@ comboize_and_fortify <- function(Mgen, Miso, Mhab,
   beta_levs <- unique(levs_ret2$beta_vals)
 
   # now, create three more that are just genetics, habitat, and density alone
-  solos <- lapply(list(`Genetics Alone` = comboize(raster::stack(Mgen), raster::stack(Miso), Mhab, 1, 0, 0),
-       `Isotopes Alone` = comboize(raster::stack(Mgen), raster::stack(Miso), Mhab, 0, 1, 0),
-       `Habitat Alone` = comboize(raster::stack(Mgen), raster::stack(Miso), Mhab, 0, 0, 1)), function(x)
+  solos <- lapply(list(`Genetics Alone` = comboize(raster::stack(mgen), raster::stack(miso), mhab, 1, 0, 0),
+       `Isotopes Alone` = comboize(raster::stack(mgen), raster::stack(miso), mhab, 0, 1, 0),
+       `Habitat Alone` = comboize(raster::stack(mgen), raster::stack(miso), mhab, 0, 0, 1)), function(x)
          {
-         as.data.frame(x, xy = TRUE, stringsAsFactors = FALSE) %>%
+         raster::as.data.frame(x, xy = TRUE, stringsAsFactors = FALSE) %>%
            setNames(c("long", "lat", "prob"))  %>%
            dplyr::tbl_df()
        })  %>%
