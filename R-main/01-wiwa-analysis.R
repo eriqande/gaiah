@@ -15,6 +15,7 @@ dir.create("outputs")
 #### CHOOSE WHETHER TO USE PRE-STORED VALUES OR RECOMPUTE THINGS####
 COMPUTE_ISO_POSTERIORS <- FALSE  # if false then it will just load these up from a cache
 RECOMPUTE_MHIA_GRID <- FALSE
+RECOMPUTE_PMGCD_GRID <- FALSE
 
 #### SOME HOUSEKEEPING VARIABLES ####
 # these are cleaner labels for the regions to be used in forcats functions:
@@ -64,6 +65,30 @@ Miso <- lapply(isotope_ref_bird_results$loo_results, function(y) {
 
 
 
+
+#### CREATE THE SUPPLEMENT TABLE OF ISOTOPE DATA SUMMARIES ####
+# this is the table that Kristina recommends.
+iso_ref_birds <- gaiah::extract_isopredictions(isoscape = isomap_job54152_prediction,
+                              birds = breeding_wiwa_isotopes,
+                              pred = "predkrig",
+                              sd = "stdkrig")
+
+# now we summarise that by location
+iso_supp_tab <- iso_ref_birds %>%
+  group_by(Location) %>%
+  summarise(state_or_province = State[1],
+            country = Country[1],
+            num_samples = n(),
+            lat = mean(lat),
+            long = mean(long),
+            dHp = mean(iso_pred),
+            sd_dHp = mean(iso_sd),
+            mean_dHf = mean(Isotope.Value),
+            sd_dHf = sd(Isotope.Value)
+  )
+
+# write that out to outputs
+readr::write_csv(iso_supp_tab, path = "outputs/supp_table_isotope_means.csv")
 
 #### GET AND PROCESS THE GENETICS AND HABITAT ####
 Mgen <- genetic_posteriors2rasters(breeding_wiwa_genetic_posteriors, genetic_regions)  # this takes about 25 seconds
@@ -145,7 +170,7 @@ Combo <- comboize(Mgen, Miso, Mhab_norm, 1, 1, 1)
 #### MAKE ALL THE INDIVIDUAL BIRD-MAP FIGURES FOR THE SUPPLEMENT ####
 wmap <- get_wrld_simpl()
 dir.create("outputs/birdmaps")
-for(i in 1:2) {   #nlayers(Mgen)) {
+for(i in 1:nlayers(Mgen)) {
   tmp <- comboize_and_fortify(Mgen[[i]], Miso[[i]], Mhab, iso_beta_levels = 1, hab_beta_levels = 1)
   tmp$bird <- names(Mgen)[i];
 
@@ -288,7 +313,96 @@ mig_dist_df <- data_frame(ID = names(MigDistMeans), dist = MigDistMeans) %>%
                                             clean_region_names
   )) %>%
   mutate(clean_region = forcats::fct_relevel(clean_region, names(clean_region_names))) %>%
-  mutate(`Genetic Assignment` = clean_region)
+  mutate(`Genetically-Assigned Region` = clean_region)
+
+#### MAKE THE PLOTS OF REMAINING MIGRATION DISTANCE OF THE CIBOLA BIRDS ####
+rem_all_plot <- ggplot(mig_dist_df, aes(x = yearday, y = dist, colour = `Genetically-Assigned Region`)) +
+  facet_wrap(~ year) +
+  scale_colour_manual(values = region_colors) +
+  geom_point() +
+  theme(legend.position="top") +
+  guides(colour = guide_legend(nrow=2)) +
+  xlab("Days Since Januaray 1") +
+  ylab("Posterion mean remaining migration distance (km)")
+
+
+wa_green <- region_colors[clean_region_names == "Wa.To.NorCalCoast"]
+rem_wa_plot <- ggplot(mig_dist_df %>% filter(ass_reg == "Wa.To.NorCalCoast"), aes(x = yearday, y = dist)) +
+facet_wrap(~ year) +
+geom_point(colour = wa_green) +
+geom_smooth() +
+xlab("Days Since Januaray 1") +
+ylab("Posterion mean remaining migration distance (km)")
+
+top <- grid.arrange(rem_all_plot, top = textGrob("(a)", x = unit(0, "npc"), just = "left", gp = gpar(fontsize = 20)))
+bottom <- grid.arrange(rem_wa_plot, top = textGrob("(b)", x = unit(0, "npc"), just = "left", gp = gpar(fontsize = 20)))
+grid.arrange(top, bottom, ncol = 1)
+final_fig <- grid.arrange(top, bottom)
+ggsave(final_fig, filename = "outputs/figures/rem_mig_dist_fig.pdf", width = 5.5, height = 11)
+
+
+#### COMPUTE PMGCD OVER DIFFERENT VALUES OF THE BETAS ####
+# note that GCD was calculated above, but we will just recompute it here too:
+# First, we make a rasterStack, GCD, that gives the great circle distance between each reference birds true
+# location and every cell in the raster.
+
+
+if(RECOMPUTE_PMGCD_GRID == TRUE) {
+  GCD <- lapply(1:nrow(kbirds), function(i)
+    great_circle_raster(wiwa_breed, kbirds$lat[i], kbirds$long[i])
+  )
+  names(GCD) <- kbirds$Short_Name
+  GCD <- raster::stack(GCD)
+
+  griddy <- c(0, 0.33, 0.66, 1.0, 1.33, 1.66, 2.0, 2.5)
+  names(griddy) <- griddy
+
+  out <- lapply(c("0.0" = 0.0, "1.0" = 1.0), function(bgen) {
+    lapply(griddy, function(biso) {
+      lapply(griddy, function(bhab) {
+        print(c(bgen, biso, bhab))
+        combo_tmp <- comboize(Mgen, Miso, Mhab_norm, beta_gen = bgen, beta_iso = biso, beta_hab = bhab)
+        combopmgc <- raster::cellStats(combo_tmp * GCD, stat = sum)
+        dplyr::data_frame(ID = names(combopmgc), pmgcd = combopmgc)
+      }) %>%
+        bind_rows(.id = "beta_hab")
+    }) %>%
+      bind_rows(.id = "beta_iso")
+  }) %>% bind_rows(.id = "beta_gen")
+
+  saveRDS(out, file = "outputs/128_pmgcd_vals.rds", compress = "xz")
+} else {
+  out <- readRDS(file = "outputs/128_pmgcd_vals.rds")
+}
+
+# now that we have that, let's get the means for each region
+region_mean_pmgcd <- kbirds %>%
+  select(region, Short_Name) %>%
+  left_join(., out %>% rename(Short_Name = ID)) %>%
+  group_by(region, beta_gen, beta_iso, beta_hab) %>%
+  summarize(mean_pmgcd = mean(pmgcd),
+            trimmed10_mean_pmgcd = mean(pmgcd, trim = 0.10)) %>%
+  ungroup() %>% arrange(region, mean_pmgcd)
+
+
+#### MAKE THE PLOTS OF MEAN PMGCD AS A FUNCTION OF THE BETAS ####
+
+# put better names on it
+rmp2 <- region_mean_pmgcd %>%
+  mutate(clean_region = forcats::fct_recode(region,  # here are a few lines to make cleaner names for the Regions
+                                            clean_region_names
+  )) %>%
+  mutate(clean_region = forcats::fct_relevel(clean_region, names(clean_region_names))) %>%
+  mutate(Region = clean_region)
+
+
+# Here for untrimmed means
+ggplot(rmp2, aes(x = as.numeric(beta_hab), y = mean_pmgcd, colour = beta_iso, linetype = beta_gen)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ Region)
+
+ggsave(filename = "outputs/figures/mean_pmgcd_by_betas.pdf", width = 14, height = 10)
 
 #### STUFF BELOW HERE IS NO LONGER ACTIVE ####
 if(FALSE) {
