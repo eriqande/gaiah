@@ -39,7 +39,7 @@ isotope_posterior_probs <- function(isoscape,
   # some stuff to evaluate while testing/developing
   if(FALSE) {
     isoscape <- isomap_job54152_prediction
-    ref_birds <- breeding_wiwa_isotopes %>% dplyr::rename(ID = Field_Num)
+    ref_birds <- breeding_wiwa_isotopes
     isoscape_pred_column <- "predkrig"
     isoscape_sd_column <- "stdkrig"
   }

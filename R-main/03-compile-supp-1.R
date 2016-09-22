@@ -1,7 +1,7 @@
 
 # this just compiles all the individual bird maps into a LaTeX document
 
-plotpath <- "../outputs/plots"
+plotpath <- "../outputs/birdmaps"
 # first arrange everyone into regions and within regions descending by latitude
 # and then create a print string for them:
 tmp <- kbirds %>% arrange(Region, desc(lat)) %>%
