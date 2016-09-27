@@ -167,6 +167,33 @@ Combo <- comboize(Mgen, Miso, Mhab_norm, 1, 1, 1)
 
 
 
+#### MAKE THE BIRD-MAP FIGURES FOR THE PAPER ####
+wmap <- get_wrld_simpl()
+dir.create("outputs/figures")
+gList <- list();
+for(i in c("eNBFR03", "wOREL03")) {
+  tmp <- comboize_and_fortify(Mgen[[i]], Miso[[i]], Mhab, iso_beta_levels = 1, hab_beta_levels = 1)
+  tmp$bird <- i;
+  latlong <- kbirds %>% filter(Short_Name == i)
+
+  gList[[i]] <- ggplot(mapping = aes(x=long, y = lat)) +
+    coord_fixed(1.3, xlim = c(-170, -50), ylim = c(33, 70)) +
+    geom_polygon(data = wmap, aes(group = group), fill = NA, color = "black", size = .05) +
+    geom_raster(data = tmp, mapping = aes(fill = prob), interpolate = TRUE) +
+    scale_fill_gradientn(colours = c("#EBEBEB", rainbow(7)), na.value = NA) +
+    theme_bw() +
+    facet_wrap( ~ beta_vals, ncol = 2) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+    geom_point(data = latlong, mapping = aes(x = long, y = lat), shape = 13, size = 2.5)
+}
+
+# now we grid those into a and b panels
+afig <- grid.arrange(gList[[1]], top = textGrob("(a)", x = unit(0.1, "npc"), just = "left", gp = gpar(fontsize = 20)))
+bfig <- grid.arrange(gList[[2]], top = textGrob("(b)", x = unit(0.1, "npc"), just = "left", gp = gpar(fontsize = 20)))
+
+final_fig <- grid.arrange(afig, bfig, ncol = 1)
+
+ggsave(final_fig, filename = "outputs/figures/figure1.pdf", height = 10, width = 14)
 #### MAKE ALL THE INDIVIDUAL BIRD-MAP FIGURES FOR THE SUPPLEMENT ####
 wmap <- get_wrld_simpl()
 dir.create("outputs/birdmaps")

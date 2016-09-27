@@ -8,7 +8,7 @@ figoutpath <- "../../git-overleaf-repos/gaiah-overleaf/figures/"
 figinpath <- "outputs/figures"
 
 #### NAME FIGS TO MOVE ####
-paper_figs <- c("pmgcd_altogether.pdf", "pmgcd_boxplots.pdf", "rem_mig_dist_fig.pdf")
+paper_figs <- c("pmgcd_altogether.pdf", "pmgcd_boxplots.pdf", "rem_mig_dist_fig.pdf", "figure1.pdf")
 paper_figs_full <- file.path(figinpath, paper_figs)
 
 
