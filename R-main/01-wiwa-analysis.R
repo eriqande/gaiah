@@ -9,6 +9,7 @@ library(stringr)
 library(ggplot2)
 library(gaiah)
 library(forcats)
+library(tikzDevice)
 
 dir.create("outputs")
 
@@ -260,28 +261,36 @@ pmGCD_super <- wide_pmGCD %>%
 
 #### MAKE THE POSTERIOR MEAN GCD SCATTERPLOTS ####
 # here is everyone on the same figure
-ggplot(pmGCD_tidy, aes(x = combo, y = pmgcd, colour = Region)) +
+tikz("outputs/figures/pmgcd_altogether_figure.tex", width = 10, height = 4)
+gplot <- ggplot(pmGCD_tidy, aes(x = combo, y = pmgcd, colour = Region)) +
   geom_point() +
   facet_wrap(~ data_type) +
   geom_abline(slope = 1, intercept = 0) +
   scale_colour_manual(values = region_colors) +
-  xlab("Posterior mean great circle distance (km) using all data sources, combined") +
-  ylab("Posterior mean GCD (km), single data source") +
+  xlab("$S^\\mathrm{pm}_i$ (km), data sources combined") +
+  ylab("$S^\\mathrm{pm}_i$ (km), single data source") +
   theme(legend.position="top")
-ggsave("outputs/figures/pmgcd_altogether.pdf", width = 10, height = 4)
-
+print(gplot)
+dev.off()
+# then you have to latex that tikz file. (and later PDFcrop it)
+system("cd outputs/figures/; pdflatex pmgcd_altogether.tex;")
 
 #### MAKE THE POSTERIOR MEAN GCD BOXPLOTS ####
 
-ggplot(pmGCD_super, aes(y = pmgcd, x = data_type, fill = Region)) +
+tikz("outputs/figures/pmgcd_boxplots_figure.tex", width = 4.2, height = 5)
+bplot <- ggplot(pmGCD_super, aes(y = pmgcd, x = data_type, fill = Region)) +
   facet_wrap(~ Region) +
   scale_fill_manual(values = region_colors) +
   geom_boxplot() +
   xlab("Data type used") +
-  ylab("Posterior Mean Great Circle Distance to True Location") +
+  ylab("{\\large $S^\\mathrm{pm}_i$ (km)}") +
   guides(fill=FALSE) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-ggsave("outputs/figures/pmgcd_boxplots.pdf", width = 4.2, height = 5)
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.title.y=element_text(margin=margin(0,11,0,0)))
+
+print(bplot)
+dev.off()
+system("cd outputs/figures/; pdflatex pmgcd_boxplots.tex; open pmgcd_boxplots.pdf")
 
 #### DO CALCULATIONS FOR THE ACTUAL CIBOLA MIGRANTS ####
 # these are for all the migrants kristen had in the first paper

@@ -10,6 +10,8 @@
 *.synctex.gz
 body_supp1.tex
 suppl1.pdf
-outputs/figures
+outputs/figures/*.pdf
+outputs/figures/pmgcd_altogether_figure.tex
+outputs/figures/pmgcd_boxplots_figure.tex
 outputs/birdmaps
 outputs/isotope_ref_bird_results.rda
