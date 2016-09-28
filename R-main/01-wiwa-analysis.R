@@ -358,8 +358,8 @@ rem_all_plot <- ggplot(mig_dist_df, aes(x = yearday, y = dist, colour = `Genetic
   geom_point() +
   theme(legend.position="top") +
   guides(colour = guide_legend(nrow=2)) +
-  xlab("Days Since Januaray 1") +
-  ylab("Posterion mean remaining migration distance (km)")
+  xlab("Days Since January 1") +
+  ylab("Posterior mean remaining migration distance (km)")
 
 
 wa_green <- region_colors[clean_region_names == "Wa.To.NorCalCoast"]
@@ -367,8 +367,8 @@ rem_wa_plot <- ggplot(mig_dist_df %>% filter(ass_reg == "Wa.To.NorCalCoast"), ae
 facet_wrap(~ year) +
 geom_point(colour = wa_green) +
 geom_smooth() +
-xlab("Days Since Januaray 1") +
-ylab("Posterion mean remaining migration distance (km)")
+xlab("Days Since January 1") +
+ylab("Posterior mean remaining migration distance (km)")
 
 top <- grid.arrange(rem_all_plot, top = textGrob("(a)", x = unit(0, "npc"), just = "left", gp = gpar(fontsize = 20)))
 bottom <- grid.arrange(rem_wa_plot, top = textGrob("(b)", x = unit(0, "npc"), just = "left", gp = gpar(fontsize = 20)))
