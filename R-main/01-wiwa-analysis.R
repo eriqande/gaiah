@@ -97,8 +97,6 @@ Mgen <- genetic_posteriors2rasters(breeding_wiwa_genetic_posteriors, genetic_reg
 Mhab <- wiwa_habitat_unclipped * wiwa_breed  # make sure to clip it with the known breeding range.
 Mhab_norm <- Mhab / raster::cellStats(Mhab, stat = sum)  # and for later analyses, treat these as posterior probs
 
-
-
 #### FIDDLY BOOKKEEPING: Select Only birds with both genetics and isotopes. Set Names wisely ####
 # I want to retain only the birds that appear both in Mgen and Miso, and I
 # want to order them so that they are all together from different locations
@@ -161,6 +159,46 @@ names(Mgen) <- kbirds$Short_Name
 Miso <- raster::stack(Miso)
 Mgen <- raster::stack(Mgen)
 
+#### SUMMARIZE THE GENETICS RESULTS (DISTRIBUTION OF MAX POSTERIORS) FOR PAPER ####
+assy <- breeding_wiwa_genetic_posteriors %>%
+  left_join(kbirds %>% select(Short_Name, region) %>% rename(true_region = region))
+
+
+# overall correct assignment:
+assy %>%
+  group_by(Short_Name) %>%
+  filter(posterior == max(posterior)) %>%
+  ungroup() %>%
+  summarise(perc_correct = mean(true_region == region, na.rm = TRUE))
+
+# see how accurate the MAP assignments are:
+assy %>%
+  group_by(Short_Name) %>%
+  filter(posterior == max(posterior)) %>%
+  group_by(true_region) %>%
+  summarise(perc_correct = mean(true_region == region))
+
+# average posteriors of correctly assigned birds
+assy %>%
+  group_by(Short_Name) %>%
+  filter(posterior == max(posterior)) %>%
+  mutate(isCorrect = region == true_region) %>%
+  group_by(isCorrect) %>%
+  summarise(mean_posterior = mean(posterior))
+
+
+# just have a little look
+ggplot(ass_to_vals, aes(x = posterior, fill = true_region)) +
+  geom_histogram() +
+  facet_wrap(~ true_region, ncol = 3)
+
+
+# now compute the fraction over 90 and 95%
+ass_to_vals %>%
+  group_by(true_region) %>%
+  summarise(over90 = mean(posterior > 0.90),
+            over50 = mean(posterior > 0.50),
+            totaln = n())
 
 #### MAKE THE 1,1,1 COMBO ####
 Combo <- comboize(Mgen, Miso, Mhab_norm, 1, 1, 1)
