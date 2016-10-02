@@ -3,7 +3,7 @@
 This is an R-package for performing **G**enetic **A**nd **I**sotopic **A**ssignment using **H**abitat features.
 
 This is currently under development, a collaboration between Eric C. Anderson, Kristen Ruegg, Kristina Paxton, and Ryan Harrigan.
-Most of the package has been written by Eric C. Anderson.  The methodology for assigning individuals using stable isotope was first written by Hannah Vander Zanden and colleagues.  It was reimplemented here and is now efficient enough to do leave one out cross validation, etc.  These parts of the code are in the file `R/vander-zanden-appendix/R`, which, for completeness, also includes the original functions obtained from Vander Zanden (though they are not exported in the package).  
+Most of the package has been written by Eric C. Anderson.  The methodology for assigning individuals using stable isotope was first written by Hannah Vander Zanden and colleagues.  It was reimplemented here and is now efficient enough to do leave one out cross validation, etc.  These parts of the code are in the file `R/vander-zanden-appendix.R`, which, for completeness, also includes the original functions obtained from Vander Zanden (though they are not exported in the package).  
 
 ## Preliminaries
 
