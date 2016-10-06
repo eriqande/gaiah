@@ -17,6 +17,7 @@ dir.create("outputs")
 COMPUTE_ISO_POSTERIORS <- FALSE  # if false then it will just load these up from a cache
 RECOMPUTE_MHIA_GRID <- FALSE
 RECOMPUTE_PMGCD_GRID <- FALSE
+REMAKE_ALL_SUPP_MAPS <- FALSE
 
 #### SOME HOUSEKEEPING VARIABLES ####
 # these are cleaner labels for the regions to be used in forcats functions:
@@ -234,33 +235,34 @@ final_fig <- grid.arrange(afig, bfig, ncol = 1)
 
 ggsave(final_fig, filename = "outputs/figures/figure1.pdf", height = 10, width = 14)
 #### MAKE ALL THE INDIVIDUAL BIRD-MAP FIGURES FOR THE SUPPLEMENT ####
-wmap <- get_wrld_simpl()
-dir.create("outputs/birdmaps")
-for(i in 1:nlayers(Mgen)) {
-  tmp <- comboize_and_fortify(Mgen[[i]], Miso[[i]], Mhab, iso_beta_levels = 1, hab_beta_levels = 1)
-  tmp$bird <- names(Mgen)[i];
+if(REMAKE_ALL_SUPP_MAPS == TRUE) {
+  wmap <- get_wrld_simpl()
+  dir.create("outputs/birdmaps")
+  for(i in 1:nlayers(Mgen)) {
+    tmp <- comboize_and_fortify(Mgen[[i]], Miso[[i]], Mhab, iso_beta_levels = 1, hab_beta_levels = 1)
+    tmp$bird <- names(Mgen)[i];
 
-  latlong <- kbirds %>% filter(Short_Name == names(Mgen)[i])
+    latlong <- kbirds %>% filter(Short_Name == names(Mgen)[i])
 
 
-  g <- ggplot(mapping = aes(x=long, y = lat)) +
-    coord_fixed(1.3, xlim = c(-170, -50), ylim = c(33, 70)) +
-    geom_polygon(data = wmap, aes(group = group), fill = NA, color = "black", size = .05) +
-    geom_raster(data = tmp, mapping = aes(fill = prob), interpolate = TRUE) +
-    scale_fill_gradientn(colours = c("#EBEBEB", rainbow(7)), na.value = NA) +
-    theme_bw() +
-    facet_grid(bird ~ beta_vals) +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    geom_point(data = latlong, mapping = aes(x = long, y = lat), shape = 13, size = 2.5)
+    g <- ggplot(mapping = aes(x=long, y = lat)) +
+      coord_fixed(1.3, xlim = c(-170, -50), ylim = c(33, 70)) +
+      geom_polygon(data = wmap, aes(group = group), fill = NA, color = "black", size = .05) +
+      geom_raster(data = tmp, mapping = aes(fill = prob), interpolate = TRUE) +
+      scale_fill_gradientn(colours = c("#EBEBEB", rainbow(7)), na.value = NA) +
+      theme_bw() +
+      facet_grid(bird ~ beta_vals) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+      geom_point(data = latlong, mapping = aes(x = long, y = lat), shape = 13, size = 2.5)
 
-  ggsave(filename = paste("outputs/birdmaps/bird_", names(Mgen)[i], ".pdf", sep = ""), height = 3, width = 19)
+    ggsave(filename = paste("outputs/birdmaps/bird_", names(Mgen)[i], ".pdf", sep = ""), height = 3, width = 19)
 
-  print(i);
+    print(i);
+  }
+
+  # TODO: PDFConcat all those into a single supplemental file, or
+  # better yet, latex them altogether.
 }
-
-# TODO: PDFConcat all those into a single supplemental file, or
-# better yet, latex them altogether.
-
 
 
 
@@ -388,6 +390,9 @@ mig_dist_df <- data_frame(ID = names(MigDistMeans), dist = MigDistMeans) %>%
   )) %>%
   mutate(clean_region = forcats::fct_relevel(clean_region, names(clean_region_names))) %>%
   mutate(`Genetically-Assigned Region` = clean_region)
+
+# save that to outputs
+save(mig_dist_df, file = "outputs/mig_dist_df.rda", compress = "xz")
 
 #### MAKE THE PLOTS OF REMAINING MIGRATION DISTANCE OF THE CIBOLA BIRDS ####
 rem_all_plot <- ggplot(mig_dist_df, aes(x = yearday, y = dist, colour = `Genetically-Assigned Region`)) +
