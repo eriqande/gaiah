@@ -160,46 +160,49 @@ names(Mgen) <- kbirds$Short_Name
 Miso <- raster::stack(Miso)
 Mgen <- raster::stack(Mgen)
 
-#### SUMMARIZE THE GENETICS RESULTS (DISTRIBUTION OF MAX POSTERIORS) FOR PAPER ####
+#### SUMMARIZE THE GENETICS RESULTS (DISTRIBUTION OF POSTERIORS) FOR PAPER ####
+# my thought here is to make some bar plots that show the distribution of things
+
+# make a data frame of all this
 assy <- breeding_wiwa_genetic_posteriors %>%
-  left_join(kbirds %>% select(Short_Name, region) %>% rename(true_region = region))
+  left_join(kbirds %>% select(Short_Name, Region)) %>%
+  mutate(ass_to_region = forcats::fct_recode(region,  # here are a few lines to make cleaner names for the Regions
+                                            clean_region_names)) %>%
+  mutate(ass_to_region = forcats::fct_relevel(ass_to_region, names(clean_region_names)))
 
+# now sort it so that it is organized first by the true Region
+# and within each it is sorted descending on the posterior prob of being
+# assigned to the correct region.
+assy2 <- assy %>%
+  group_by(ID) %>%
+  mutate(correct_ass_prob = posterior[Region == ass_to_region]) %>%
+  arrange(Region, desc(correct_ass_prob))
 
-# overall correct assignment:
-assy %>%
-  group_by(Short_Name) %>%
-  filter(posterior == max(posterior)) %>%
+# now we want to get an ordering for the indivuals
+ords <- assy2 %>%
+  filter(Region == ass_to_region) %>%
   ungroup() %>%
-  summarise(perc_correct = mean(true_region == region, na.rm = TRUE))
+  arrange(Region, desc(correct_ass_prob)) %>%
+  mutate(ind = 1:n()) %>%
+  select(ID, ind)
 
-# see how accurate the MAP assignments are:
-assy %>%
-  group_by(Short_Name) %>%
-  filter(posterior == max(posterior)) %>%
-  group_by(true_region) %>%
-  summarise(perc_correct = mean(true_region == region))
-
-# average posteriors of correctly assigned birds
-assy %>%
-  group_by(Short_Name) %>%
-  filter(posterior == max(posterior)) %>%
-  mutate(isCorrect = region == true_region) %>%
-  group_by(isCorrect) %>%
-  summarise(mean_posterior = mean(posterior))
+assy3 <- left_join(assy2, ords) %>%
+  rename(`Region Assigned` = ass_to_region)
 
 
-# just have a little look
-ggplot(ass_to_vals, aes(x = posterior, fill = true_region)) +
-  geom_histogram() +
-  facet_wrap(~ true_region, ncol = 3)
+
+g <- ggplot(assy3, aes(x = ind, y = posterior, fill = `Region Assigned`)) +
+  geom_bar(stat = "identity", position = "stack", width = 1.0) +
+  scale_fill_manual(values = region_colors) +
+  facet_grid(. ~ Region, drop=TRUE, space="free", scales="free") +
+  xlab("Individuals ordered by posterior to correct region") +
+  theme(axis.text.x=element_blank()) +
+  theme(axis.ticks.x=element_blank())
 
 
-# now compute the fraction over 90 and 95%
-ass_to_vals %>%
-  group_by(true_region) %>%
-  summarise(over90 = mean(posterior > 0.90),
-            over50 = mean(posterior > 0.50),
-            totaln = n())
+ggsave(g, filename = "outputs/figures/gsi_sim_q_values.pdf", width = 14, height = 5)
+
+
 
 #### MAKE THE 1,1,1 COMBO ####
 Combo <- comboize(Mgen, Miso, Mhab_norm, 1, 1, 1)
