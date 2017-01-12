@@ -117,7 +117,7 @@ get_wrld_simpl <- function() {
   load(system.file("data/wrld_simpl.rda", package = "maptools"))
   wrld_simpl
 }
-
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("wrld_simpl")) # keep R CMD Check from making Notes
 
 #' a raster of the breeding range of Wilson's warbler
 #'

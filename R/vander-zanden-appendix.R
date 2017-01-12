@@ -21,7 +21,7 @@ vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
   # isotope values from the birds and the columns are the vza_rescale_reps
   tmp <- lapply(1:nrow(D), function(i) {
     n <- D[i,"cnt"]
-    rnorm(n * vza_rescale_reps, mean = D[i, "meanH"], sd = D[i, "sdH"]) %>%
+    stats::rnorm(n * vza_rescale_reps, mean = D[i, "meanH"], sd = D[i, "sdH"]) %>%
       matrix(ncol = vza_rescale_reps)
   })
   tissue_mat <- do.call(rbind, tmp)
@@ -29,7 +29,7 @@ vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
   # do the same for the precip values
   tmp <- lapply(1:nrow(D), function(i) {
     n <- D[i,"cnt"]
-    rnorm(n * vza_rescale_reps, mean = D[i, "meaniso"], sd = D[i, "sdiso"]) %>%
+    stats::rnorm(n * vza_rescale_reps, mean = D[i, "meaniso"], sd = D[i, "sdiso"]) %>%
       matrix(ncol = vza_rescale_reps)
   })
   precip_mat <- do.call(rbind, tmp)
@@ -37,14 +37,14 @@ vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
   # now we just do the regression of each column (1,...,vza_rescale_reps) of the tissue_mat and the precip_mat
   # and we grab the slopes and intercepts and return them as a data frame
   lapply(1:ncol(tissue_mat), function(i) {
-    lm(tissue_mat[,i] ~ precip_mat[,i]) %>%
-      coef() %>%
+    stats::lm(tissue_mat[,i] ~ precip_mat[,i]) %>%
+      stats::coef() %>%
       unname()
   }) %>%
     unlist() %>%
     matrix(ncol = 2, byrow = TRUE) %>%
     as.data.frame() %>%
-    setNames(c("intercepts", "slopes")) %>%
+    stats::setNames(c("intercepts", "slopes")) %>%
     dplyr::tbl_df()
 }
 
@@ -82,7 +82,7 @@ vza_mean_and_var_rasters <- function(iso_raster, si) {
   # return the mean and var of those:
   list(
     mean.raster = iso_raster * mean(slopes) + mean(intercepts),
-    var.raster = raster::stackApply(rstack, fun = var, indices = 1)
+    var.raster = raster::stackApply(rstack, fun = stats::var, indices = 1)
   )
 }
 
@@ -119,7 +119,7 @@ vza_assign <- function(rescale_mean,
   # now copy Tmu to get a raster of the right dimensions to returns then set
   # its cell values as normal densities.
   ret <- Tmu
-  values(ret) <- dnorm(x = bird_iso, mean = values(Tmu), sd = sqrt(values(Tsig)))
+  raster::values(ret) <- stats::dnorm(x = bird_iso, mean = raster::values(Tmu), sd = sqrt(raster::values(Tsig)))
   ret / raster::cellStats(ret, sum)
 }
 

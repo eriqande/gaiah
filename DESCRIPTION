@@ -23,9 +23,8 @@ Imports:
     tidyr
 Suggests:
     knitr,
-    rmarkdown,
-    testthat
+    rmarkdown
 VignetteBuilder: knitr
-License: GPL
+License: CC0
 LazyData: TRUE
 RoxygenNote: 5.0.1

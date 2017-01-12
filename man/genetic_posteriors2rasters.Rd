@@ -24,7 +24,10 @@ then the posterior probabilty with which the birds were assigned to the groups n
 "smeared out" in a raster over the spatial extent of the groups.
 }
 \examples{
+library(raster)  # needed to deal with "genetic_regions" variable
 # get a small subset of individuals so it doesn't take too long
+data(breeding_wiwa_genetic_posteriors)
+data(genetic_regions)
 BW <- breeding_wiwa_genetic_posteriors \%>\%
   dplyr::filter(Short_Name \%in\% c("eNBFR01", "wABCA05", "wORHA21"))
 

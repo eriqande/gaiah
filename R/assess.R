@@ -27,7 +27,7 @@ great_circle_raster <- function(R, lat, long) {
   stopifnot(length(lat) == 1, length(long) == 1)
 
   ret <- R  # just initialize this way to get the right resolution, etc
-  values(ret) <- geosphere::distCosine(c(long, lat), xyFromCell(R, 1:ncell(R)))
+  raster::values(ret) <- geosphere::distCosine(c(long, lat), raster::xyFromCell(R, 1:raster::ncell(R)))
   ret * 0.001
 }
 
@@ -39,9 +39,9 @@ great_circle_raster <- function(R, lat, long) {
 #' This function is not exported currently, but is used in min_hpd_inclusion_area
 #' @param B a raster of posterior probs
 hpd_cumul <- function(B) {
-  ord <- order(values(B), decreasing = TRUE, na.last = TRUE)
-  cumul = cumsum(values(B)[ord])
-  values(B)[ord] <- cumul
+  ord <- order(raster::values(B), decreasing = TRUE, na.last = TRUE)
+  cumul = cumsum(raster::values(B)[ord])
+  raster::values(B)[ord] <- cumul
   B
 }
 
@@ -72,10 +72,10 @@ min_hpd_inclusion_area <- function(M, lat, long) {
   cc <- abs(dd - mindist) < 10-8  # don't test equality of numerics...
 
   # here is the hpd value at that point
-  hpd_at_ll <- raster::cellStats(cc * hpc, sum, na.rm = TRUE) / cellStats(cc, sum, na.rm = TRUE)
+  hpd_at_ll <- raster::cellStats(cc * hpc, sum, na.rm = TRUE) / raster::cellStats(cc, sum, na.rm = TRUE)
 
   # now, get the area of the hpd_at_ll  HPD CI
-  hpc_area <- raster::cellStats( (hpc < (hpd_at_ll + 1e-9)) * area(hpc), stat = sum, na.rm = TRUE)
+  hpc_area <- raster::cellStats( (hpc < (hpd_at_ll + 1e-9)) * raster::area(hpc), stat = sum, na.rm = TRUE)
 
   # return both the cumulative prob and the cumulative HPD area
   list(area = hpc_area, cumul_prob = hpd_at_ll)
@@ -102,8 +102,8 @@ min_hpd_inclusion_area <- function(M, lat, long) {
 #' @export
 min_hpd_inc_area_df <- function(birds, R) {
 
-  lats <- kbirds$lat
-  longs <- kbirds$long
+  lats <- birds$lat
+  longs <- birds$long
   names(lats) <- birds$Short_Name
   names(longs) <- birds$Short_Name
   birds_df <- birds$Short_Name

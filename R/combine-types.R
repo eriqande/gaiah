@@ -21,7 +21,7 @@ comboize <- function(Mgen, Miso, Mhab, beta_gen, beta_iso, beta_hab) {
   stopifnot(class(Mhab) == "RasterLayer")
 
   # make a rasterStack of Mhab that is the right length
-  Mhab_stack <- raster::stack(lapply(1:nlayers(Miso), function(x) Mhab))
+  Mhab_stack <- raster::stack(lapply(1:raster::nlayers(Miso), function(x) Mhab))
 
   tmp  <- (Mgen ^ beta_gen) * (Miso ^ beta_iso) * (Mhab_stack ^ beta_hab)
 
@@ -64,8 +64,8 @@ comboize_and_fortify <- function(mgen, miso, mhab,
     lapply(iso_beta_levels, function(ibl) {
       lapply(hab_beta_levels, function(hbl) {
         comboize(raster::stack(mgen), raster::stack(miso), mhab, gbl, ibl, hbl) %>%
-        raster::as.data.frame(., xy = TRUE, stringsAsFactors = FALSE) %>%
-          setNames(c("long", "lat", "prob"))  %>%
+          raster::as.data.frame(xy = TRUE, stringsAsFactors = FALSE) %>%
+          stats::setNames(c("long", "lat", "prob"))  %>%
           dplyr::tbl_df()
       }) %>% dplyr::bind_rows(.id = "habitat_beta")
     }) %>% dplyr::bind_rows(.id = "isotope_beta")
@@ -84,16 +84,22 @@ comboize_and_fortify <- function(mgen, miso, mhab,
        `Habitat Alone` = comboize(raster::stack(mgen), raster::stack(miso), mhab, 0, 0, 1)), function(x)
          {
          raster::as.data.frame(x, xy = TRUE, stringsAsFactors = FALSE) %>%
-           setNames(c("long", "lat", "prob"))  %>%
+           stats::setNames(c("long", "lat", "prob"))  %>%
            dplyr::tbl_df()
        })  %>%
     dplyr::bind_rows(.id = "beta_vals")
 
   ret <- dplyr::bind_rows(solos, levs_ret2)
   ret$beta_vals <- factor(ret$beta_vals, levels = c("Habitat Alone", "Genetics Alone", "Isotopes Alone", beta_levs))
-  ret %>% select(beta_vals, long, lat, prob)
+  ret %>% dplyr::select(beta_vals, long, lat, prob)
 }
-
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("genetics_beta",
+                                                        "isotope_beta",
+                                                        "habitat_beta",
+                                                        "beta_vals",
+                                                        "long",
+                                                        "lat",
+                                                        "prob"))
 
 
 
