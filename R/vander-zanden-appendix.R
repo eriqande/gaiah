@@ -101,7 +101,7 @@ vza_mean_and_var_rasters <- function(iso_raster, si) {
 #' @param sd_indiv the individual component of the variance term.
 #' This is a value to be determined by the user.  The standard approach is to
 #' use the mean of the SDs observed among individuals at all of the calibration sites.
-#' @param birds_iso a single value giving the isotope ratio found in the individual's feather.
+#' @param bird_iso a single value giving the isotope ratio found in the individual's feather.
 #' @details This is a fairly low-level function.  It returns a raster of posterior probs (they are
 #' scaled to sum to one over all cells).
 #' @export
@@ -120,7 +120,7 @@ vza_assign <- function(rescale_mean,
   # its cell values as normal densities.
   ret <- Tmu
   values(ret) <- dnorm(x = bird_iso, mean = values(Tmu), sd = sqrt(values(Tsig)))
-  ret / cellStats(ret, sum)
+  ret / raster::cellStats(ret, sum)
 }
 
 
@@ -214,7 +214,7 @@ raster.conversion <- function (original.raster, reg.par, scratch.dir) {
   setwd(scratch.dir)
   all.files <- dir(pattern=".grd")
   n <- length(all.files)
-  all.rasters <- stack(all.files)
+  all.rasters <- raster::stack(all.files)
   mean.raster <- original.raster*mean(reg.par$slopes) + mean(reg.par$intercepts)
   SD.raster <- stackApply(all.rasters, fun=sd, indices=c(rep(1,n)))
   return(list(mean.raster=mean.raster, SD.raster=SD.raster))

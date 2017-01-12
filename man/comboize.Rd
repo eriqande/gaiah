@@ -14,11 +14,11 @@ comboize(Mgen, Miso, Mhab, beta_gen, beta_iso, beta_hab)
 \item{Mhab}{a single layer raster with the habitat suitabiilty measure as a normalized
 probability surface.}
 
-\item{beta_gen}{the exponent to raise the genetic raster to}
+\item{beta_gen}{the exponent to raise the habitat raster to}
 
 \item{beta_iso}{the exponent to raise the isotope raster to}
 
-\item{beta_gen}{the exponent to raise the habitat raster to}
+\item{beta_hab}{the exponent to raise the genetic raster to}
 }
 \description{
 This just multiplies the rasters together, each raised to the appropriate

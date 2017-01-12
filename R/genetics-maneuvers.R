@@ -17,7 +17,12 @@
 #' can't subset rasterStacks to change orders, etc., and it mangles names.
 #' @export
 #' @examples
-#' GPRs <-  genetic_posteriors2rasters(breeding_wiwa_genetic_posteriors, genetic_regions)
+#' # get a small subset of individuals so it doesn't take too long
+#' BW <- breeding_wiwa_genetic_posteriors %>%
+#'   dplyr::filter(Short_Name %in% c("eNBFR01", "wABCA05", "wORHA21"))
+#'
+#' # run the function on those
+#' GPRs <-  genetic_posteriors2rasters(BW, genetic_regions)
 genetic_posteriors2rasters <- function(G, R) {
 
   inGnotR <- setdiff(unique(G$region), names(R))

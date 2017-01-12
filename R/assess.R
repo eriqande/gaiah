@@ -66,16 +66,16 @@ min_hpd_inclusion_area <- function(M, lat, long) {
   dd <- gcd * (hpc > 0)
 
   # here is the minimum distance to a nonNA cell
-  mindist <- cellStats(dd, min, na.rm = TRUE)
+  mindist <- raster::cellStats(dd, min, na.rm = TRUE)
 
   # here is a mask that picks out the closest cell(s)
   cc <- abs(dd - mindist) < 10-8  # don't test equality of numerics...
 
   # here is the hpd value at that point
-  hpd_at_ll <- cellStats(cc * hpc, sum, na.rm = TRUE) / cellStats(cc, sum, na.rm = TRUE)
+  hpd_at_ll <- raster::cellStats(cc * hpc, sum, na.rm = TRUE) / cellStats(cc, sum, na.rm = TRUE)
 
   # now, get the area of the hpd_at_ll  HPD CI
-  hpc_area <- cellStats( (hpc < (hpd_at_ll + 1e-9)) * area(hpc), stat = sum, na.rm = TRUE)
+  hpc_area <- raster::cellStats( (hpc < (hpd_at_ll + 1e-9)) * area(hpc), stat = sum, na.rm = TRUE)
 
   # return both the cumulative prob and the cumulative HPD area
   list(area = hpc_area, cumul_prob = hpd_at_ll)

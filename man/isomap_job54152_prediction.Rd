@@ -15,7 +15,7 @@ analyses here are:
   \item{stdkrig}{Fill in}
 }}
 \source{
-Kristina Paxton and ISOMAP (PROVIDE URL)
+Kristina Paxton and ISOMAP (http://isomap.rcac.purdue.edu:8080/gridsphere/gridsphere)
 }
 \usage{
 isomap_job54152_prediction

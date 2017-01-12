@@ -20,7 +20,7 @@ This is the precip component of the variance term.}
 This is a value to be determined by the user.  The standard approach is to
 use the mean of the SDs observed among individuals at all of the calibration sites.}
 
-\item{birds_iso}{a single value giving the isotope ratio found in the individual's feather.}
+\item{bird_iso}{a single value giving the isotope ratio found in the individual's feather.}
 }
 \description{
 This is a rewrite of the function \code{assignment} from the Vander

@@ -8,15 +8,21 @@ comboize_and_fortify(mgen, miso, mhab, true_lat = NA, true_long = NA,
   gen_beta_levels = 1, iso_beta_levels = c(1), hab_beta_levels = c(1))
 }
 \arguments{
+\item{mgen}{genetics posterior raster}
+
+\item{miso}{isotope posterior raster}
+
+\item{mhab}{habitat suitability raster}
+
 \item{true_lat}{the true latitude where the bird was sampled.}
 
 \item{true_long}{the true longitude where the bird was sampled.}
 
-\item{Mgen}{genetics posterior raster}
+\item{gen_beta_levels}{vector of the desired values of gen_beta}
 
-\item{Miso}{isotope posterior raster}
+\item{iso_beta_levels}{vector of the desired values of iso_beta}
 
-\item{Mhab}{habitat suitability raster}
+\item{hab_beta_levels}{vector of the desired values of hab_beta}
 }
 \description{
 This takes Mgen, Miso, and Mhab for a single bird

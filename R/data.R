@@ -96,7 +96,7 @@
 #'   \item{predkrig}{Fill in}
 #'   \item{stdkrig}{Fill in}
 #' }
-#' @source Kristina Paxton and ISOMAP (PROVIDE URL)
+#' @source Kristina Paxton and ISOMAP (http://isomap.rcac.purdue.edu:8080/gridsphere/gridsphere)
 "isomap_job54152_prediction"
 
 

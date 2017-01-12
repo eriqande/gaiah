@@ -71,7 +71,7 @@ isotope_posterior_probs <- function(isoscape,
         dplyr::filter(ID != bird)
 
       # compute the rescaling parameters for bird
-      ass_pars <- gaiah:::.private_rescale(loo_birds, isoscape_prediction, isoscape_std_err)
+      ass_pars <- private_rescale(loo_birds, isoscape_prediction, isoscape_std_err)
 
       # now do the assignment
       bird_ass <- gaiah::vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
@@ -92,7 +92,7 @@ isotope_posterior_probs <- function(isoscape,
     names(birds_vec) <- birds_vec
 
     # compute the rescaling parameters from all the ref birds
-    ass_pars <- gaiah:::.private_rescale(ref_birds_with_isoscape_vals, isoscape_prediction, isoscape_std_err)
+    ass_pars <- private_rescale(ref_birds_with_isoscape_vals, isoscape_prediction, isoscape_std_err)
 
     # then lapply over the birds and assign them
     globN <<- 0
@@ -138,12 +138,13 @@ isotope_posterior_probs <- function(isoscape,
 #' have been attached to it.
 #' @param pred  The raster of isoscape predictions
 #' @param std The raster of isoscape standard deviations
-.private_rescale <- function(birds, pred, std) {
+#' @keywords internal
+private_rescale <- function(birds, pred, std) {
 
     # remove locations that have only one bird in them
     birds_tossed <- birds %>%
       dplyr::group_by(Location) %>%
-      dplyr::filter(n() > 1)
+      dplyr::filter(dplyr::n() > 1)
 
     # group birds by location
     bird_groups <- gaiah::group_birds_by_location(D = birds_tossed, feather_isotope_col = "Isotope.Value", location_col = "Location")

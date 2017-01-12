@@ -111,7 +111,7 @@ group_birds_by_location <- function(D,
   ret <- D %>%
     dplyr::group_by_(location_col) %>%
     dplyr::summarise_(
-      cnt = ~n(),
+      cnt = ~dplyr::n(),
       meanH = lazyeval::interp(~mean(x), x = as.name(feather_isotope_col)),
       sdH = lazyeval::interp(~sd(x), x = as.name(feather_isotope_col)),
       meaniso = lazyeval::interp(~mean(x), x = as.name(iso_pred_col)),

@@ -80,7 +80,7 @@ iso_supp_tab <- iso_ref_birds %>%
   group_by(Location) %>%
   summarise(state_or_province = State[1],
             country = Country[1],
-            num_samples = n(),
+            num_samples = dplyr::n(),
             lat = mean(lat),
             long = mean(long),
             dHp = mean(iso_pred),
@@ -183,7 +183,7 @@ ords <- assy2 %>%
   filter(Region == ass_to_region) %>%
   ungroup() %>%
   arrange(Region, desc(correct_ass_prob)) %>%
-  mutate(ind = 1:n()) %>%
+  mutate(ind = 1:dplyr::n()) %>%
   select(ID, ind)
 
 assy3 <- left_join(assy2, ords) %>%
@@ -282,7 +282,7 @@ GCD <- raster::stack(GCD)
 genpmgc <- raster::cellStats(Mgen * GCD, stat = sum)
 isopmgc <- raster::cellStats(Miso * GCD, stat = sum)
 combopmgc <- raster::cellStats(Combo * GCD, stat = sum)
-habpmgc <- cellStats(GCD * Mhab_norm, stat = sum)
+habpmgc <- raster::cellStats(GCD * Mhab_norm, stat = sum)
 names(habpmgc) <- names(GCD)
 
 # now, make a data frame with all that in there:
@@ -447,10 +447,10 @@ if(RECOMPUTE_PMGCD_GRID == TRUE) {
         combopmgc <- raster::cellStats(combo_tmp * GCD, stat = sum)
         dplyr::data_frame(ID = names(combopmgc), pmgcd = combopmgc)
       }) %>%
-        bind_rows(.id = "beta_hab")
+        dplyr::bind_rows(.id = "beta_hab")
     }) %>%
-      bind_rows(.id = "beta_iso")
-  }) %>% bind_rows(.id = "beta_gen")
+      dplyr::bind_rows(.id = "beta_iso")
+  }) %>% dplyr::bind_rows(.id = "beta_gen")
 
   saveRDS(out, file = "outputs/128_pmgcd_vals.rds", compress = "xz")
 } else {
@@ -568,10 +568,10 @@ if(RECOMPUTE_MHIA_GRID == TRUE) {
         print(c(bgen, biso, bhab))
         min_hpd_inc_area_df(kbirds, comboize(Mgen, Miso, Mhab_norm, beta_gen = bgen, beta_iso = biso, beta_hab = bhab))$area
       }) %>%
-        bind_rows(.id = "beta_hab")
+        dplyr::bind_rows(.id = "beta_hab")
     }) %>%
-      bind_rows(.id = "beta_iso")
-  }) %>% bind_rows(.id = "beta_gen")
+      dplyr::bind_rows(.id = "beta_iso")
+  }) %>% dplyr::bind_rows(.id = "beta_gen")
 
   #saveRDS(out, file = "outputs/64_vals.rds", compress = "xz")
 } else {
