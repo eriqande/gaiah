@@ -86,7 +86,7 @@ isotope_posterior_probs <- function(isoscape,
     ass_pars <- private_rescale(ref_birds_with_isoscape_vals, isoscape_prediction, isoscape_std_err)
 
     # then lapply over the birds and assign them
-    ret <- lapply(birds_vec, function(bird) {
+    regular <- lapply(birds_vec, function(bird) {
       globN <- which(birds_vec == bird)
       message("Doing (NOT-leave-one-out) isotope procedure for individual ", bird, ". Number ", globN, " of ", length(birds_vec))
 
@@ -109,7 +109,7 @@ isotope_posterior_probs <- function(isoscape,
   # later on we will return other thigns in this list too.
   list(
     loo_results = loo_ass,
-    regular = ret
+    regular = regular
   )
 }
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("n", "Location", "ID", "<<-")) # keep R CMD Check from making Notes
