@@ -1,5 +1,7 @@
 # gaiah
 
+[![Travis-CI Build Status](https://travis-ci.org/eriqande/gaiah.svg?branch=master)](https://travis-ci.org/eriqande/gaiah)
+
 This is an R-package for performing **G**enetic **A**nd **I**sotopic **A**ssignment using **H**abitat features.
 
 This is currently under development, a collaboration between Eric C. Anderson, Kristen Ruegg, Kristina Paxton, and Ryan Harrigan.
