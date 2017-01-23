@@ -49,12 +49,12 @@ vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
 }
 
 
-#' calculate a raster of mean and Var of expected tissue isotopes from precip data and resampled regressions
+#' calculate a raster of mean and variance of expected tissue isotopes from precip data and resampled regressions
 #'
 #' This is a rewrite of the function \code{raster.conversion} from the Vander Zanden
 #' appendix.  They expressed things in terms of the standard deviations, but they need to
 #' be turned into variances, anyway, so that is what we've done here.  Following the notation
-#' of paper on Wilson's warbler, this function computes $tilde{T}^{(mu)}$ (returned as
+#' of the paper on Wilson's warbler, this function computes $tilde{T}^{(mu)}$ (returned as
 #' list component \code{mean.raster}) and $R^{(sigma^2)}$ (returned as list component
 #' \code{var.raster})
 #' @param iso_raster the raster of isotope precipitation values, for example, like that
@@ -88,7 +88,7 @@ vza_mean_and_var_rasters <- function(iso_raster, si) {
 
 
 
-#' assign posterior probability or origin for a bird in each cell in the raster
+#' assign posterior probability of origin for a bird in each cell in the raster
 #'
 #' This is a rewrite of the function \code{assignment} from the Vander
 #' Zanden appendix code.

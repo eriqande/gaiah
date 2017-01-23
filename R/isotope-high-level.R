@@ -36,22 +36,14 @@ isotope_posterior_probs <- function(isoscape,
   loo_ass <- NULL
   regular <- NULL
 
-  # some stuff to evaluate while testing/developing
-  if(FALSE) {
-    isoscape <- isomap_job54152_prediction
-    ref_birds <- breeding_wiwa_isotopes
-    isoscape_pred_column <- "predkrig"
-    isoscape_sd_column <- "stdkrig"
-  }
-
   # I think I can get away with not really doing this till later, but if I have to do it
   # repeatedly, it will be better to get that done here and use the variables later
-  isoscape_prediction <- gaiah::isomap2raster(isomap_job54152_prediction, isoscape_pred_column)
-  isoscape_std_err <- gaiah::isomap2raster(isomap_job54152_prediction, isoscape_sd_column)
+  isoscape_prediction <- isomap2raster(isoscape, isoscape_pred_column)
+  isoscape_std_err <- isomap2raster(isoscape, isoscape_sd_column)
 
 
   # put the isoscape predictions at each ref_birds sampling location
-  ref_birds_with_isoscape_vals <- gaiah::extract_isopredictions(isoscape = isoscape,
+  ref_birds_with_isoscape_vals <- extract_isopredictions(isoscape = isoscape,
                                                          birds = ref_birds,
                                                          pred = isoscape_pred_column,
                                                          sd = isoscape_sd_column)
@@ -62,9 +54,8 @@ isotope_posterior_probs <- function(isoscape,
     birds_vec <- ref_birds_with_isoscape_vals$ID
     names(birds_vec) <- birds_vec
 
-    globN <<- 0
     loo_ass <- lapply(birds_vec, function(bird) {
-      globN <<- globN + 1
+      globN <- which(birds_vec == bird)
       message("Doing leave-one-out isotope procedure for individual ", bird, ". Number ", globN, " of ", length(birds_vec))
       # drop the focal bird from the reference data set
       loo_birds <- ref_birds_with_isoscape_vals %>%
@@ -74,7 +65,7 @@ isotope_posterior_probs <- function(isoscape,
       ass_pars <- private_rescale(loo_birds, isoscape_prediction, isoscape_std_err)
 
       # now do the assignment
-      bird_ass <- gaiah::vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
+      bird_ass <- vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
                                    rescale_var = ass_pars$R_sigma_squared,
                                    precip_sd = isoscape_std_err,
                                    sd_indiv = ass_pars$sd_indiv,
@@ -95,13 +86,12 @@ isotope_posterior_probs <- function(isoscape,
     ass_pars <- private_rescale(ref_birds_with_isoscape_vals, isoscape_prediction, isoscape_std_err)
 
     # then lapply over the birds and assign them
-    globN <<- 0
     ret <- lapply(birds_vec, function(bird) {
-      globN <<- globN + 1
+      globN <- which(birds_vec == bird)
       message("Doing (NOT-leave-one-out) isotope procedure for individual ", bird, ". Number ", globN, " of ", length(birds_vec))
 
       # now do the assignment
-      bird_ass <- gaiah::vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
+      bird_ass <- vza_assign(rescale_mean = ass_pars$Tilde_T_mu,
                                     rescale_var = ass_pars$R_sigma_squared,
                                     precip_sd = isoscape_std_err,
                                     sd_indiv = ass_pars$sd_indiv,
@@ -122,8 +112,7 @@ isotope_posterior_probs <- function(isoscape,
     regular = ret
   )
 }
-
-
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("n", "Location", "ID", "<<-")) # keep R CMD Check from making Notes
 
 #' internal function for isotope machinations
 #'
@@ -144,16 +133,16 @@ private_rescale <- function(birds, pred, std) {
     # remove locations that have only one bird in them
     birds_tossed <- birds %>%
       dplyr::group_by(Location) %>%
-      dplyr::filter(dplyr::n() > 1)
+      dplyr::filter(n() > 1)
 
     # group birds by location
-    bird_groups <- gaiah::group_birds_by_location(D = birds_tossed, feather_isotope_col = "Isotope.Value", location_col = "Location")
+    bird_groups <- group_birds_by_location(D = birds_tossed, feather_isotope_col = "Isotope.Value", location_col = "Location")
 
     # do the vza rescaling.  This gives us 1000 interepts and slopes
     ints_and_slopes <- vza_rescale(bird_groups)
 
     # get the mean and SD of the of the bootstrapped tissue predictions
-    tmp_list <- gaiah::vza_mean_and_var_rasters(pred, ints_and_slopes)
+    tmp_list <- vza_mean_and_var_rasters(pred, ints_and_slopes)
 
     # now we are ready to return a list of everything we need for vza_assignment
     list(

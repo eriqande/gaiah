@@ -2,7 +2,7 @@
 % Please edit documentation in R/vander-zanden-appendix.R
 \name{vza_assign}
 \alias{vza_assign}
-\title{assign posterior probability or origin for a bird in each cell in the raster}
+\title{assign posterior probability of origin for a bird in each cell in the raster}
 \usage{
 vza_assign(rescale_mean, rescale_var, precip_sd, sd_indiv, bird_iso)
 }

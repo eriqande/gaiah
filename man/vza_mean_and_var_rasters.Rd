@@ -2,7 +2,7 @@
 % Please edit documentation in R/vander-zanden-appendix.R
 \name{vza_mean_and_var_rasters}
 \alias{vza_mean_and_var_rasters}
-\title{calculate a raster of mean and Var of expected tissue isotopes from precip data and resampled regressions}
+\title{calculate a raster of mean and variance of expected tissue isotopes from precip data and resampled regressions}
 \usage{
 vza_mean_and_var_rasters(iso_raster, si)
 }
@@ -17,7 +17,7 @@ with columns named "slopes" and "intercepts" like that returned by \code{\link{v
 This is a rewrite of the function \code{raster.conversion} from the Vander Zanden
 appendix.  They expressed things in terms of the standard deviations, but they need to
 be turned into variances, anyway, so that is what we've done here.  Following the notation
-of paper on Wilson's warbler, this function computes $tilde{T}^{(mu)}$ (returned as
+of the paper on Wilson's warbler, this function computes $tilde{T}^{(mu)}$ (returned as
 list component \code{mean.raster}) and $R^{(sigma^2)}$ (returned as list component
 \code{var.raster})
 }

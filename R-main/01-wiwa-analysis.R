@@ -70,7 +70,7 @@ Miso <- lapply(isotope_ref_bird_results$loo_results, function(y) {
 
 #### CREATE THE SUPPLEMENT TABLE OF ISOTOPE DATA SUMMARIES ####
 # this is the table that Kristina recommends.
-iso_ref_birds <- gaiah::extract_isopredictions(isoscape = isomap_job54152_prediction,
+iso_ref_birds <- extract_isopredictions(isoscape = isomap_job54152_prediction,
                               birds = breeding_wiwa_isotopes,
                               pred = "predkrig",
                               sd = "stdkrig")
@@ -80,7 +80,7 @@ iso_supp_tab <- iso_ref_birds %>%
   group_by(Location) %>%
   summarise(state_or_province = State[1],
             country = Country[1],
-            num_samples = dplyr::n(),
+            num_samples = n(),
             lat = mean(lat),
             long = mean(long),
             dHp = mean(iso_pred),
@@ -183,7 +183,7 @@ ords <- assy2 %>%
   filter(Region == ass_to_region) %>%
   ungroup() %>%
   arrange(Region, desc(correct_ass_prob)) %>%
-  mutate(ind = 1:dplyr::n()) %>%
+  mutate(ind = 1:n()) %>%
   select(ID, ind)
 
 assy3 <- left_join(assy2, ords) %>%
