@@ -1,5 +1,5 @@
 Package: gaiah
-Title: Genetic And Isotopic Assignment accounting for Habitat suitability
+Title: Genetic and Isotopic Assignment Accounting for Habitat Suitability
 Description: Tools for using genetic markers, stable isotope data, and habtitat
     suitability data to calculate posterior probabilities of breeding origin of
     migrating birds.
@@ -24,7 +24,6 @@ Imports:
 Suggests:
     knitr,
     rmarkdown
-VignetteBuilder: knitr
 License: CC0
 LazyData: TRUE
 RoxygenNote: 5.0.1
