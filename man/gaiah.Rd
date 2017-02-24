@@ -10,8 +10,11 @@ Tools for using genetic markers, stable isotope data, and habtitat
 suitability data to calculate posterior probabilities of breeding origin of
 migrating birds.
 }
-\section{Section one}{
-
-Put something here
+\details{
+There is not a tutorial within the package, currently.  The best place to find an
+example of how to use the functions in this package is at the GitHub repository:
+\url{https://github.com/eriqande/gaiah-wiwa}. Go ahead and read the README there.
+It should provide you with everything you need to get up and running with
+the gaiah package.
 }
 
