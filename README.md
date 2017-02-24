@@ -26,4 +26,4 @@ In lieu of a vignette, we provide the full source code for our use of the `gaiah
 Reproducing the results from Ruegg et al. (2017)
 ------------------------------------------------
 
-If you want to reproduce all the results from the paper "Genetic assignment with isotopes and habitat suitability (GAIAH), a migratory bird case study" in *Methods in Ecology and Evolution* you will have to get the `gaiah` package and then also clone the analysis repository from <https://github.com/eriqande/gaiah-wiwa> and then follow the instructions in the [that repository's README](https://github.com/eriqande/gaiah-wiwa/blob/master/README.md).
+If you want to reproduce all the results from the paper "Genetic assignment with isotopes and habitat suitability (GAIAH), a migratory bird case study" in *Methods in Ecology and Evolution* you will have to get the `gaiah` package and then also clone the analysis repository from <https://github.com/eriqande/gaiah-wiwa> and then follow the instructions in [that repository's README](https://github.com/eriqande/gaiah-wiwa/blob/master/README.md).

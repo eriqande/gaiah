@@ -39,4 +39,4 @@ with isotopes and habitat suitability (GAIAH), a migratory bird case study"
 in _Methods in Ecology and Evolution_ you will have to get the `gaiah` package
 and then also clone the analysis repository from
 [https://github.com/eriqande/gaiah-wiwa](https://github.com/eriqande/gaiah-wiwa)
-and then follow the instructions in the [that repository's README](https://github.com/eriqande/gaiah-wiwa/blob/master/README.md).
+and then follow the instructions in [that repository's README](https://github.com/eriqande/gaiah-wiwa/blob/master/README.md).

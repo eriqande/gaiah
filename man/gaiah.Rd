@@ -16,5 +16,8 @@ example of how to use the functions in this package is at the GitHub repository:
 \url{https://github.com/eriqande/gaiah-wiwa}. Go ahead and read the README there.
 It should provide you with everything you need to get up and running with
 the gaiah package.
+
+Finally, note that the development version of gaiah is available at
+\url{https://github.com/eriqande/gaiah}.
 }
 

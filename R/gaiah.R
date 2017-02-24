@@ -12,6 +12,9 @@
 #' It should provide you with everything you need to get up and running with
 #' the gaiah package.
 #'
+#' Finally, note that the development version of gaiah is available at
+#' \url{https://github.com/eriqande/gaiah}.
+#'
 #' @docType package
 #' @name gaiah
 NULL
