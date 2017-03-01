@@ -30,4 +30,5 @@ Zanden appendix code.
 This is a fairly low-level function.  It returns a raster of posterior probs (they are
 scaled to sum to one over all cells).
 }
+\keyword{internal}
 

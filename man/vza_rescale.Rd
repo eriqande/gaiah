@@ -23,4 +23,5 @@ of the original \code{rescale} function from the Vander Zanden appendix.
 It takes the output of \code{\link{group_birds_by_location}} directly
 and does the parametric bootstrapping for vza_rescale_reps samples.
 }
+\keyword{internal}
 

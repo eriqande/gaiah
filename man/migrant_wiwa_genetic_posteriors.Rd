@@ -4,7 +4,7 @@
 \name{migrant_wiwa_genetic_posteriors}
 \alias{migrant_wiwa_genetic_posteriors}
 \title{Posterior probs of genetic region of origin for 926 WIWAs sampled during migration}
-\format{A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
+\format{A tibble with 5,556 rows and 6 columns. The relevant variables for
 analyses here are:
 \describe{
   \item{ID}{unique identifier for each bird}

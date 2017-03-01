@@ -18,4 +18,16 @@ Given an input raster R, this returns a raster of the same dimension where
 every cell is the great circle distance between lat, and long, and the
 center of every cell in R.
 }
+\examples{
+# We compute the great circle distance between the lat/long of my office
+# California, to every cell in the raster denoting the breeding habitat
+# of Wilson's warbler:
+gcr <- great_circle_raster(wiwa_breed, lat = 36.951564, long = -122.065116)
+
+# plot that if you want
+\dontrun{
+plot(gcr)
+lines(get_wrld_simpl())
+}
+}
 

@@ -20,4 +20,5 @@ actually inluded in the range map, we use the closest cell on the range map to t
 location).  This operates on a single rasterLayer.  To operate on a rasterBrick of posteriors
 and a data frame of lat-longs, use `min_hpd_inc_area_df()`.
 }
+\keyword{internal}
 

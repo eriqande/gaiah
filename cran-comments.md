@@ -14,3 +14,6 @@ Currently no known reverse dependencies
 ## User Notices
 
 This is the first submission of this package.
+I submitted it a few days ago and Uwe spotted a typo
+and recommended that I add more examples to each function.
+I have done that now.  Thank you Uwe!

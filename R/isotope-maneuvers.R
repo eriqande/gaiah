@@ -43,6 +43,13 @@ isomap2raster <- function(isoscape,
 #' @param sd name of the column holding the standard deviation (like "stdkrig") in the
 #' isoscape data frame
 #' @export
+#' @examples
+#' # Using the provided data from breeding Wilson's warblers and the provided
+#' # predictions from isomap_job54152:
+#' x <- extract_isopredictions(isoscape = isomap_job54152_prediction,
+#'                        birds = breeding_wiwa_isotopes,
+#'                        pred = "predkrig",
+#'                        sd = "stdkrig")
 extract_isopredictions <- function(isoscape,
                                    birds,
                                    pred = "predkrig",
@@ -101,6 +108,25 @@ extract_isopredictions <- function(isoscape,
 #' throws an error if any of the locations has only 1 sample.  If that is the case, you may consider
 #' merging that sample with another location (or dropping it?).
 #' @export
+#' @examples
+#' # first run the example for extract_isopredictions to get the variable "x"
+#' example("extract_isopredictions")
+#'
+#' # If this were run it gives an error because there is only 1 bird at the
+#' # location "Charlevoix"
+#' \dontrun{
+#' group_birds_by_location(x, feather_isotope_col = "Isotope.Value", location_col = "Location")
+#' }
+#'
+#'
+#' # remove that one bird at Charlevoix and re-run
+#' y <- x %>%
+#'   dplyr::filter(Location != "Charlevoix")
+#'
+#' # then group birds by location
+#' gbl <- group_birds_by_location(D = y,
+#'                                feather_isotope_col = "Isotope.Value",
+#'                                location_col = "Location")
 group_birds_by_location <- function(D,
                                     feather_isotope_col,
                                     location_col,

@@ -23,6 +23,17 @@
 #' @param lat a latitude value (must be of length 1)
 #' @param long a longitude value (must be of length 1)
 #' @export
+#' @examples
+#' # We compute the great circle distance between the lat/long of my office
+#' # California, to every cell in the raster denoting the breeding habitat
+#' # of Wilson's warbler:
+#' gcr <- great_circle_raster(wiwa_breed, lat = 36.951564, long = -122.065116)
+#'
+#' # plot that if you want
+#' \dontrun{
+#' plot(gcr)
+#' lines(get_wrld_simpl())
+#' }
 great_circle_raster <- function(R, lat, long) {
   stopifnot(length(lat) == 1, length(long) == 1)
 
@@ -38,6 +49,7 @@ great_circle_raster <- function(R, lat, long) {
 #'
 #' This function is not exported currently, but is used in min_hpd_inclusion_area
 #' @param B a raster of posterior probs
+#' @keywords internal
 hpd_cumul <- function(B) {
   ord <- order(raster::values(B), decreasing = TRUE, na.last = TRUE)
   cumul = cumsum(raster::values(B)[ord])
@@ -57,7 +69,7 @@ hpd_cumul <- function(B) {
 #' @param M the posterior surface matrix
 #' @param lat the true latitude
 #' @param long the true longitude
-#' @export
+#' @keywords internal
 min_hpd_inclusion_area <- function(M, lat, long) {
   hpc <- hpd_cumul(M)
   gcd <- great_circle_raster(M, lat, long)
@@ -99,7 +111,7 @@ min_hpd_inclusion_area <- function(M, lat, long) {
 #' the names of R}
 #' \item{missingFromDF}{ character vector of names in R that are not found in birds$Short_Name.}
 #' }
-#' @export
+#' @keywords internal
 min_hpd_inc_area_df <- function(birds, R) {
 
   lats <- birds$lat

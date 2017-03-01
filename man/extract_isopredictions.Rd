@@ -25,4 +25,12 @@ the values associated with each location from the raster and returns the full da
 with those values joined on in columns named iso_pred and iso_sd.  It overwrites
 those columns with a warning if either of those columns already exists in the data.
 }
+\examples{
+# Using the provided data from breeding Wilson's warblers and the provided
+# predictions from isomap_job54152:
+x <- extract_isopredictions(isoscape = isomap_job54152_prediction,
+                       birds = breeding_wiwa_isotopes,
+                       pred = "predkrig",
+                       sd = "stdkrig")
+}
 

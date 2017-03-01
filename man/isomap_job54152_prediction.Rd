@@ -4,7 +4,7 @@
 \name{isomap_job54152_prediction}
 \alias{isomap_job54152_prediction}
 \title{Predicted isotope values from ISOMAP}
-\format{A tbl_df-ed (from dplyr) data frame with 10,786 rows and 12 variables. The relevant variables for
+\format{A tibble with 10,786 rows and 12 variables. The relevant variables for
 analyses here are:
 \describe{
   \item{lat}{latitude of the predicted location}

@@ -34,6 +34,53 @@ them using a leave one out procedure (i.e. each bird in turn is left out while r
 a tissue isomap).  Should not be TRUE if assign_birds is non NULL.}
 }
 \description{
-This takes care of the whole shebang.  More description later
+This function automates the whole process described in the appendix of
+Vander Zanden et al. (2014) for computing the posterior probability of
+origin of an individual (or group of individuals) given its stable isotope
+values, and those of a set of reference individuals, and an ISOMAP prediction
+of isotope values across a landscape.
+}
+\details{
+For details see:
+
+Vander Zanden HB, Wunder MB, Hobson KA, Van Wilgenburg SL, Wassenaar LI, Welker JM, Bowen GJ (2014)
+Contrasting assignment of migratory organisms to geographic origins using long-term versus year-specific
+precipitation isotope maps. Methods in Ecology and Evolution, 5, 891-900.
+
+And the re-explanation of that method in Ruegg et al. (2017).
+}
+\examples{
+# obtain posterior probability rasters for the first 2 birds in the migrant_wiwa_isotopes
+# data set.  This takes about 15 seconds on my laptop (most of that time is preparatory---once
+# that is done, each bird goes much faster). So we don't run it here.
+\dontrun{
+birds2 <- isotope_posterior_probs(isoscape = isomap_job54152_prediction,
+                        ref_birds = breeding_wiwa_isotopes,
+                        assign_birds = migrant_wiwa_isotopes[1:2,]
+                        )
+}
+
+# However, you can load the results as a saved data object to see what they look like:
+birds2 <- example_isotope_posteriors
+
+
+# Since the ref_birds above were separate from the migrant birds, no leave-one-out was
+# performed.  Hence \\code{birds2$loo_results} is NULL, and all the results are in
+# \\code{birds2$regular}.
+
+# Look at the names of the resulting output for the first bird:
+names(birds2$regular[[1]])
+
+names(birds2$regular[[1]]$assignment_parameters)
+
+
+
+# If you want to do self-assignment for a whole bunch of reference birds, it takes much longer.
+# It looks like this:
+\dontrun{
+self_ass <- isotope_posterior_probs(isoscape = isomap_job54152_prediction,
+                                    ref_birds = breeding_wiwa_isotopes,
+                                    self_assign = TRUE)
+}
 }
 

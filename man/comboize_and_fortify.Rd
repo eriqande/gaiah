@@ -4,8 +4,8 @@
 \alias{comboize_and_fortify}
 \title{prepare fortified output for multipanel plot}
 \usage{
-comboize_and_fortify(mgen, miso, mhab, true_lat = NA, true_long = NA,
-  gen_beta_levels = 1, iso_beta_levels = c(1), hab_beta_levels = c(1))
+comboize_and_fortify(mgen, miso, mhab, gen_beta_levels = 1,
+  iso_beta_levels = c(1), hab_beta_levels = c(1))
 }
 \arguments{
 \item{mgen}{genetics posterior raster}
@@ -13,10 +13,6 @@ comboize_and_fortify(mgen, miso, mhab, true_lat = NA, true_long = NA,
 \item{miso}{isotope posterior raster}
 
 \item{mhab}{habitat suitability raster}
-
-\item{true_lat}{the true latitude where the bird was sampled.}
-
-\item{true_long}{the true longitude where the bird was sampled.}
 
 \item{gen_beta_levels}{vector of the desired values of gen_beta}
 
@@ -30,5 +26,29 @@ and, if available, the true breeding location.  Then it
 computes the combo-ized raster at all the requested levels
 of the exponents, and creates a fortified data frame of the
 results suitable for plotting in ggplot
+}
+\examples{
+# run through the example for comboize to get the variables
+# mgen, miso, and mhab that we will use.
+example(comboize)
+
+# then run that on the first bird to get a data frame
+# that you can use with ggplot
+ff <- comboize_and_fortify(mgen[[1]], miso[[1]], mhab)
+
+# this can be plotted with ggplot2
+\dontrun{
+library(ggplot2)
+wmap <- get_wrld_simpl()
+ggplot(mapping = aes(x=long, y = lat)) +
+  coord_fixed(1.3, xlim = c(-170, -50), ylim = c(33, 70)) +
+  geom_polygon(data = wmap, aes(group = group), fill = NA, color = "black", size = .05) +
+  geom_raster(data = ff, mapping = aes(fill = prob), interpolate = TRUE) +
+  scale_fill_gradientn(colours = c("#EBEBEB", rainbow(7)), na.value = NA) +
+  theme_bw() +
+  facet_wrap( ~ beta_vals, ncol = 2) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+}
+
 }
 

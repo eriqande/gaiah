@@ -15,6 +15,34 @@
 #' @param beta_iso the exponent to raise the isotope raster to
 #' @param beta_gen the exponent to raise the habitat raster to
 #' @export
+#' @examples
+#' # first, run through the example for \code{\link{isotope_posterior_probs}} to get
+#' # the rasters for two migrant birds. This gives us the list \code{birds2}
+#' example(isotope_posterior_probs)
+#'
+#' # extract the posterior probs rasters from  that output into a raster stack
+#' miso <- lapply(birds2$regular, function(x) x$posterior_probs) %>%
+#'   raster::stack()
+#'
+#' # see the names of the birds we are dealing with:
+#' names(miso)
+#'
+#' # get the genetic posteriors for those two birds
+#' mig_gen2 <- migrant_wiwa_genetic_posteriors %>%
+#'   dplyr::filter(ID %in% c(names(miso)))
+#'
+#' # make genetic posterior rasters for those two birds, make sure they are
+#' # sorted in the same order as miso, and make a raster stack of it
+#' mgen <- genetic_posteriors2rasters(G = mig_gen2, R = genetic_regions)[names(miso)] %>%
+#'   raster::stack()
+#'
+#' # make a normalized prior from habitat quality that is zeros everywhere
+#' # outside of the "known" range.
+#' tmp <- wiwa_habitat_unclipped * wiwa_breed
+#' mhab <- tmp / raster::cellStats(tmp, sum)
+#'
+#' # combine genetics, isotopes and habitat with exponents of 1 on each
+#' mcombo <- comboize(mgen, miso, mhab, 1, 1, 1)
 comboize <- function(Mgen, Miso, Mhab, beta_gen, beta_iso, beta_hab) {
   stopifnot(class(Mgen) == "RasterStack")
   stopifnot(class(Miso) == "RasterStack")
@@ -43,14 +71,34 @@ comboize <- function(Mgen, Miso, Mhab, beta_gen, beta_iso, beta_hab) {
 #' @param mgen  genetics posterior raster
 #' @param miso isotope posterior raster
 #' @param mhab habitat suitability raster
-#' @param true_lat  the true latitude where the bird was sampled.
-#' @param true_long the true longitude where the bird was sampled.
 #' @param gen_beta_levels vector of the desired values of gen_beta
 #' @param iso_beta_levels vector of the desired values of iso_beta
 #' @param hab_beta_levels vector of the desired values of hab_beta
 #' @export
+#' @examples
+#' # run through the example for comboize to get the variables
+#' # mgen, miso, and mhab that we will use.
+#' example(comboize)
+#'
+#' # then run that on the first bird to get a data frame
+#' # that you can use with ggplot
+#' ff <- comboize_and_fortify(mgen[[1]], miso[[1]], mhab)
+#'
+#' # this can be plotted with ggplot2
+#' \dontrun{
+#' library(ggplot2)
+#' wmap <- get_wrld_simpl()
+#' ggplot(mapping = aes(x=long, y = lat)) +
+#'   coord_fixed(1.3, xlim = c(-170, -50), ylim = c(33, 70)) +
+#'   geom_polygon(data = wmap, aes(group = group), fill = NA, color = "black", size = .05) +
+#'   geom_raster(data = ff, mapping = aes(fill = prob), interpolate = TRUE) +
+#'   scale_fill_gradientn(colours = c("#EBEBEB", rainbow(7)), na.value = NA) +
+#'   theme_bw() +
+#'   facet_wrap( ~ beta_vals, ncol = 2) +
+#'   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+#' }
+#'
 comboize_and_fortify <- function(mgen, miso, mhab,
-                                 true_lat = NA, true_long = NA,
                                  gen_beta_levels = 1,
                                  iso_beta_levels = c(1.0),
                                  hab_beta_levels = c(1.0)

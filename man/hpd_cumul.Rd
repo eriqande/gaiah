@@ -12,4 +12,5 @@ hpd_cumul(B)
 \description{
 This function is not exported currently, but is used in min_hpd_inclusion_area
 }
+\keyword{internal}
 

@@ -1,8 +1,8 @@
 
 
-#' gaiah: Genetic And Isotopic Assignment accounting for Habitat suitability
+#' gaiah: Genetic and Isotopic Assignment Accounting for Habitat Suitability
 #'
-#' Tools for using genetic markers, stable isotope data, and habtitat
+#' Tools for using genetic markers, stable isotope data, and habitat
 #' suitability data to calculate posterior probabilities of breeding origin of
 #' migrating birds.
 #'

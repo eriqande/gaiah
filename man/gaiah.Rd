@@ -4,9 +4,9 @@
 \name{gaiah}
 \alias{gaiah}
 \alias{gaiah-package}
-\title{gaiah: Genetic And Isotopic Assignment accounting for Habitat suitability}
+\title{gaiah: Genetic and Isotopic Assignment Accounting for Habitat Suitability}
 \description{
-Tools for using genetic markers, stable isotope data, and habtitat
+Tools for using genetic markers, stable isotope data, and habitat
 suitability data to calculate posterior probabilities of breeding origin of
 migrating birds.
 }

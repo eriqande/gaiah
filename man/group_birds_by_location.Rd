@@ -45,4 +45,24 @@ This function
 throws an error if any of the locations has only 1 sample.  If that is the case, you may consider
 merging that sample with another location (or dropping it?).
 }
+\examples{
+# first run the example for extract_isopredictions to get the variable "x"
+example("extract_isopredictions")
+
+# If this were run it gives an error because there is only 1 bird at the
+# location "Charlevoix"
+\dontrun{
+group_birds_by_location(x, feather_isotope_col = "Isotope.Value", location_col = "Location")
+}
+
+
+# remove that one bird at Charlevoix and re-run
+y <- x \%>\%
+  dplyr::filter(Location != "Charlevoix")
+
+# then group birds by location
+gbl <- group_birds_by_location(D = y,
+                               feather_isotope_col = "Isotope.Value",
+                               location_col = "Location")
+}
 

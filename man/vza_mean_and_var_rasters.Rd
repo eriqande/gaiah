@@ -21,4 +21,5 @@ of the paper on Wilson's warbler, this function computes $tilde{T}^{(mu)}$ (retu
 list component \code{mean.raster}) and $R^{(sigma^2)}$ (returned as list component
 \code{var.raster})
 }
+\keyword{internal}
 

@@ -3,8 +3,8 @@
 \docType{data}
 \name{migrant_wiwa_isotopes}
 \alias{migrant_wiwa_isotopes}
-\title{Isotope values, latitude, longitude and more data from 357 breeding Wilson's warblers}
-\format{A tbl_df-ed (from dplyr) data frame with 688 rows and 14 variables. The relevant variables for
+\title{Isotope values and meta data for 688 migrating Wilson's Warblers}
+\format{A tibble with 688 rows and 14 variables. The relevant variables for
 analyses here are:
 \describe{
   \item{ID}{unique identifier for each bird}
@@ -18,7 +18,8 @@ migrant_wiwa_isotopes
 }
 \description{
 A data frame containing hydrogen isotope values, lat, long, and IDs and some other
-columns of data for birds sampled during migration from Arizona.
+columns of data for birds sampled during migration from Arizona.  604 of the individuals
+in this data set also have values in \code{\link{migrant_wiwa_genetic_posteriors}}.
 }
 \keyword{datasets}
 

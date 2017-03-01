@@ -4,12 +4,11 @@
 \name{breeding_wiwa_genetic_posteriors}
 \alias{breeding_wiwa_genetic_posteriors}
 \title{Posterior probs of genetic region origin from Leave-one-out cross validation for breeding WIWAs}
-\format{A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
-analyses here are:
+\format{A tibble with 2,358 rows and 5 variables. The variables are:
 \describe{
   \item{ID}{unique identifier for each bird}
   \item{Short_Name}{another id for the bird}
-  \item{Number of loci}{Number of loci successfully typed}
+  \item{NumberOfLoci}{Number of loci successfully typed}
   \item{region}{one of the genetic regions}
   \item{posterior}{the posterior prob of originating from that region}
 }}

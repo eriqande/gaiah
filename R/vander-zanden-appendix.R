@@ -11,7 +11,7 @@
 #' @param vza_rescale_reps Number of simulated regressions to do.  Default is 1000.
 #' @return Returns a matrix with vza_rescale_reps rows.  Column 1 is "intercepts" and column
 #' two is "slopes"
-#' @export
+#' @keywords internal
 vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
 
   D <- as.data.frame(SBL) # make sure to un-tbl-df it if need be
@@ -61,7 +61,7 @@ vza_rescale <- function(SBL, vza_rescale_reps = 1000) {
 #' produced by \code{\link{isomap2raster}}.
 #' @param si  slopes and intercepts from the resampled regressions.  This is a data frame
 #' with columns named "slopes" and "intercepts" like that returned by \code{\link{vza_rescale}}
-#' @export
+#' @keywords internal
 vza_mean_and_var_rasters <- function(iso_raster, si) {
 
   # note, with really large rasters, we may end up wanting to write them to disk, but
@@ -104,7 +104,7 @@ vza_mean_and_var_rasters <- function(iso_raster, si) {
 #' @param bird_iso a single value giving the isotope ratio found in the individual's feather.
 #' @details This is a fairly low-level function.  It returns a raster of posterior probs (they are
 #' scaled to sum to one over all cells).
-#' @export
+#' @keywords internal
 vza_assign <- function(rescale_mean,
                        rescale_var,
                        precip_sd,

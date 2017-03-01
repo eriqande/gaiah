@@ -4,7 +4,7 @@
 \name{breeding_wiwa_isotopes}
 \alias{breeding_wiwa_isotopes}
 \title{Isotope values, latitude, longitude and more data from 357 breeding Wilson's warblers}
-\format{A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
+\format{A tibble with 357 rows and 15 variables. The relevant variables for
 analyses here are:
 \describe{
   \item{ID}{unique identifier for each bird}
@@ -21,7 +21,7 @@ breeding_wiwa_isotopes
 \description{
 A data frame containing hydrogen isotope values, lat, long, and IDs and some other
 columns of data for birds sampled on the breeding grounds. Notice that the latitude
-column is named "lat" and the longitude column is named "long".  Those names are both,
+column is named "lat" and the longitude column is named "long".  Those names are both
 all lowercase.  That is the way we roll here.  Make sure that you use "lat" and "long" instead
 of "Lat" and "Long".
 }

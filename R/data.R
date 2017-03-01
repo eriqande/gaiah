@@ -4,11 +4,11 @@
 #'
 #' A data frame containing hydrogen isotope values, lat, long, and IDs and some other
 #' columns of data for birds sampled on the breeding grounds. Notice that the latitude
-#' column is named "lat" and the longitude column is named "long".  Those names are both,
+#' column is named "lat" and the longitude column is named "long".  Those names are both
 #' all lowercase.  That is the way we roll here.  Make sure that you use "lat" and "long" instead
 #' of "Lat" and "Long".
 #'
-#' @format A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
+#' @format A tibble with 357 rows and 15 variables. The relevant variables for
 #' analyses here are:
 #' \describe{
 #'   \item{ID}{unique identifier for each bird}
@@ -21,11 +21,12 @@
 
 
 
-#' Isotope values, latitude, longitude and more data from 357 breeding Wilson's warblers
+#' Isotope values and meta data for 688 migrating Wilson's Warblers
 #'
 #' A data frame containing hydrogen isotope values, lat, long, and IDs and some other
-#' columns of data for birds sampled during migration from Arizona.
-#' @format A tbl_df-ed (from dplyr) data frame with 688 rows and 14 variables. The relevant variables for
+#' columns of data for birds sampled during migration from Arizona.  604 of the individuals
+#' in this data set also have values in \code{\link{migrant_wiwa_genetic_posteriors}}.
+#' @format A tibble with 688 rows and 14 variables. The relevant variables for
 #' analyses here are:
 #' \describe{
 #'   \item{ID}{unique identifier for each bird}
@@ -44,12 +45,11 @@
 #' A data frame of the same birds (roughly) that appear in \code{\link{breeding_wiwa_isotopes}}.  A long
 #' format data frame with 2,358 rows and 5 columns
 #'
-#' @format A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
-#' analyses here are:
+#' @format A tibble with 2,358 rows and 5 variables. The variables are:
 #' \describe{
 #'   \item{ID}{unique identifier for each bird}
 #'   \item{Short_Name}{another id for the bird}
-#'   \item{Number of loci}{Number of loci successfully typed}
+#'   \item{NumberOfLoci}{Number of loci successfully typed}
 #'   \item{region}{one of the genetic regions}
 #'   \item{posterior}{the posterior prob of originating from that region}
 #' }
@@ -64,7 +64,7 @@
 #'  A long
 #' format data frame with 5,556 rows and 6 columns
 #'
-#' @format A tbl_df-ed (from dplyr) data frame with 357 rows and 14 variables. The relevant variables for
+#' @format A tibble with 5,556 rows and 6 columns. The relevant variables for
 #' analyses here are:
 #' \describe{
 #'   \item{ID}{unique identifier for each bird}
@@ -86,7 +86,7 @@
 #' A data frame containing predicted hydrogen isotope values, lat, long, and IDs and some other
 #' columns of data prections made by ISOMAP
 #'
-#' @format A tbl_df-ed (from dplyr) data frame with 10,786 rows and 12 variables. The relevant variables for
+#' @format A tibble with 10,786 rows and 12 variables. The relevant variables for
 #' analyses here are:
 #' \describe{
 #'   \item{lat}{latitude of the predicted location}
@@ -178,3 +178,18 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c("wrld_simpl")) # keep R 
 #'
 #' @source Ryan Harrigan
 "wiwa_habitat_unclipped"
+
+
+
+
+
+#' Output of \code{\link{isotope_posterior_probs}} for two migrant birds.
+#'
+#' Because it takes too long to generate this output for future examples, we
+#' just store it as a data object to use in examples.  See the example in
+#' \code{\link{isotope_posterior_probs}} to see what this is.
+#' @source Ruegg et al 2014
+"example_isotope_posteriors"
+
+
+
