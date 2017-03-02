@@ -24,7 +24,7 @@
 #' @param long a longitude value (must be of length 1)
 #' @export
 #' @examples
-#' # We compute the great circle distance between the lat/long of my office
+#' # We compute the great circle distance between the lat/long of my office in
 #' # California, to every cell in the raster denoting the breeding habitat
 #' # of Wilson's warbler:
 #' gcr <- great_circle_raster(wiwa_breed, lat = 36.951564, long = -122.065116)

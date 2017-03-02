@@ -16,8 +16,8 @@
 #' @param beta_gen the exponent to raise the habitat raster to
 #' @export
 #' @examples
-#' # first, run through the example for \code{\link{isotope_posterior_probs}} to get
-#' # the rasters for two migrant birds. This gives us the list \code{birds2}
+#' # first, run through the example for isotope_posterior_probs() to get
+#' # the rasters for two migrant birds. This gives us the list "birds2"
 #' example(isotope_posterior_probs)
 #'
 #' # extract the posterior probs rasters from  that output into a raster stack

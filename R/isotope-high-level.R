@@ -50,8 +50,8 @@
 #'
 #'
 #' # Since the ref_birds above were separate from the migrant birds, no leave-one-out was
-#' # performed.  Hence \code{birds2$loo_results} is NULL, and all the results are in
-#' # \code{birds2$regular}.
+#' # performed.  Hence birds2$loo_results is NULL, and all the results are in
+#' # birds2$regular.
 #'
 #' # Look at the names of the resulting output for the first bird:
 #' names(birds2$regular[[1]])

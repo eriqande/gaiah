@@ -25,8 +25,8 @@ This just multiplies the rasters together, each raised to the appropriate
 exponent, normalizes and returns the result
 }
 \examples{
-# first, run through the example for \\code{\\link{isotope_posterior_probs}} to get
-# the rasters for two migrant birds. This gives us the list \\code{birds2}
+# first, run through the example for isotope_posterior_probs() to get
+# the rasters for two migrant birds. This gives us the list "birds2"
 example(isotope_posterior_probs)
 
 # extract the posterior probs rasters from  that output into a raster stack
