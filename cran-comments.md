@@ -4,8 +4,9 @@
 * win-builder (devel and release)
 
 ## R CMD check results
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 notes
 
+The 1 note = "first-time submission"
 
 ## Downstream dependencies
 
@@ -15,5 +16,5 @@ Currently no known reverse dependencies
 
 This is the first submission of this package.
 I submitted it a few days ago and Uwe spotted a typo
-and recommended that I add more examples to each function.
-I have done that now.  Thank you Uwe!
+and also recommended that I add more examples to each function.
+I have done that now. Thank you Uwe!
