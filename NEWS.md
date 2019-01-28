@@ -1,3 +1,6 @@
+# gaiah 0.0.3
+
+* Imported dplyr n() function to work with dplyr 0.8.0
 
 # gaiah 0.0.2
 

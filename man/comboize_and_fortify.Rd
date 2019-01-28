@@ -51,4 +51,3 @@ ggplot(mapping = aes(x=long, y = lat)) +
 }
 
 }
-

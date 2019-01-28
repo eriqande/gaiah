@@ -20,4 +20,3 @@ the gaiah package.
 Finally, note that the development version of gaiah is available at
 \url{https://github.com/eriqande/gaiah}.
 }
-

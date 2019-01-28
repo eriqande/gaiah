@@ -23,4 +23,3 @@ A data frame of the same birds (roughly) that appear in \code{\link{breeding_wiw
 format data frame with 2,358 rows and 5 columns
 }
 \keyword{datasets}
-

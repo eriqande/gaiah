@@ -24,4 +24,3 @@ Then with that output I can pump it all into vza_assign for a particular (left-o
 an assign bird.  I should return the fitted model for each one.
 }
 \keyword{internal}
-

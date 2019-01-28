@@ -30,4 +30,3 @@ plot(gcr)
 lines(get_wrld_simpl())
 }
 }
-

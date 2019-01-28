@@ -21,4 +21,3 @@ location).  This operates on a single rasterLayer.  To operate on a rasterBrick 
 and a data frame of lat-longs, use `min_hpd_inc_area_df()`.
 }
 \keyword{internal}
-

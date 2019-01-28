@@ -25,4 +25,3 @@ A long
 format data frame with 5,556 rows and 6 columns
 }
 \keyword{datasets}
-

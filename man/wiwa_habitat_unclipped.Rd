@@ -23,4 +23,3 @@ wiwa_habitat_unclipped
 }
 }
 \keyword{datasets}
-

@@ -22,4 +22,3 @@ columns of data for birds sampled during migration from Arizona.  604 of the ind
 in this data set also have values in \code{\link{migrant_wiwa_genetic_posteriors}}.
 }
 \keyword{datasets}
-

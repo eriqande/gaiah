@@ -16,4 +16,3 @@ ws <- get_wrld_simpl()
 head(ws)
 \dontrun{plot(ws)}
 }
-

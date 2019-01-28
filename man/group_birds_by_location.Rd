@@ -65,4 +65,3 @@ gbl <- group_birds_by_location(D = y,
                                feather_isotope_col = "Isotope.Value",
                                location_col = "Location")
 }
-

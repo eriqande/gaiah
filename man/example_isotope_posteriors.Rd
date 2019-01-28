@@ -17,4 +17,3 @@ just store it as a data object to use in examples.  See the example in
 \code{\link{isotope_posterior_probs}} to see what this is.
 }
 \keyword{datasets}
-

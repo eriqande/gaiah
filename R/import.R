@@ -13,3 +13,6 @@ NULL
 
 
 
+
+#' @importFrom dplyr n
+NULL

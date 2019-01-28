@@ -53,4 +53,3 @@ mhab <- tmp / raster::cellStats(tmp, sum)
 # combine genetics, isotopes and habitat with exponents of 1 on each
 mcombo <- comboize(mgen, miso, mhab, 1, 1, 1)
 }
-

@@ -31,4 +31,3 @@ This is a fairly low-level function.  It returns a raster of posterior probs (th
 scaled to sum to one over all cells).
 }
 \keyword{internal}
-

@@ -25,4 +25,3 @@ A data frame containing predicted hydrogen isotope values, lat, long, and IDs an
 columns of data prections made by ISOMAP
 }
 \keyword{datasets}
-

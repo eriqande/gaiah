@@ -29,4 +29,3 @@ names with lats and longs and a rasterStack or rasterBrick and it returns
 the min hpd inclusion area for each bird in a tbl_df-ed data frame.
 }
 \keyword{internal}
-

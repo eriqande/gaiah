@@ -4,7 +4,8 @@
 \alias{extract_isopredictions}
 \title{Add the isomap prediction and sd in columns attached to the feather isotope data frame}
 \usage{
-extract_isopredictions(isoscape, birds, pred = "predkrig", sd = "stdkrig")
+extract_isopredictions(isoscape, birds, pred = "predkrig",
+  sd = "stdkrig")
 }
 \arguments{
 \item{isoscape}{the data frame of prediction.txt from ISOMAP.  The latitude column must be named
@@ -33,4 +34,3 @@ x <- extract_isopredictions(isoscape = isomap_job54152_prediction,
                        pred = "predkrig",
                        sd = "stdkrig")
 }
-

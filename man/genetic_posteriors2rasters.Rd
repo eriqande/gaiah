@@ -34,4 +34,3 @@ BW <- breeding_wiwa_genetic_posteriors \%>\%
 # run the function on those
 GPRs <-  genetic_posteriors2rasters(BW, genetic_regions)
 }
-

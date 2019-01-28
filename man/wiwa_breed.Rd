@@ -31,4 +31,3 @@ wiwa_breed
 a raster of the breeding range of Wilson's warbler
 }
 \keyword{datasets}
-

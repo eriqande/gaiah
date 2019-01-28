@@ -83,4 +83,3 @@ self_ass <- isotope_posterior_probs(isoscape = isomap_job54152_prediction,
                                     self_assign = TRUE)
 }
 }
-

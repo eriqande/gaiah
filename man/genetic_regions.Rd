@@ -25,4 +25,3 @@ genetic_regions
 The sum over layers gives the same as \code{\link{wiwa_breed}}
 }
 \keyword{datasets}
-

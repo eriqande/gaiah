@@ -22,4 +22,3 @@ list component \code{mean.raster}) and $R^{(sigma^2)}$ (returned as list compone
 \code{var.raster})
 }
 \keyword{internal}
-

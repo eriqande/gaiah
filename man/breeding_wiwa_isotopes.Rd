@@ -26,4 +26,3 @@ all lowercase.  That is the way we roll here.  Make sure that you use "lat" and 
 of "Lat" and "Long".
 }
 \keyword{datasets}
-
