@@ -4,14 +4,16 @@
 \name{breeding_wiwa_isotopes}
 \alias{breeding_wiwa_isotopes}
 \title{Isotope values, latitude, longitude and more data from 357 breeding Wilson's warblers}
-\format{A tibble with 357 rows and 15 variables. The relevant variables for
+\format{
+A tibble with 357 rows and 15 variables. The relevant variables for
 analyses here are:
 \describe{
   \item{ID}{unique identifier for each bird}
   \item{Isotope.Value}{hydrogen isotope ratios measured in the bird's feather}
   \item{lat}{latitude of the bird's breeding/sampling location}
   \item{long}{latitude of the bird's breeding/sampling location}
-}}
+}
+}
 \source{
 Kristen Ruegg, Jeff Kelly, Thomas Smith
 }

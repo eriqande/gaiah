@@ -4,7 +4,8 @@
 \name{genetic_regions}
 \alias{genetic_regions}
 \title{RasterStack showing the 6 genetic regions that Wilson's warblers may be assigned to}
-\format{RasterStack with 6 layers. Each contains 1's in the genetic region and 0's elsewhere.
+\format{
+RasterStack with 6 layers. Each contains 1's in the genetic region and 0's elsewhere.
 The sum of these layers is the raster \code{\link{wiwa_breed}}.
 \describe{
 \item{class}{ RasterStack }
@@ -14,7 +15,8 @@ The sum of these layers is the raster \code{\link{wiwa_breed}}.
 \item{coord. ref.}{ +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0 }
 \item{data source}{in memory}
 \item{names}{ CalSierra, Basin.Rockies, Eastern, AK.EastBC.AB, Wa.To.NorCalCoast, CentCalCoast }
-}}
+}
+}
 \source{
 Ruegg et al 2014
 }

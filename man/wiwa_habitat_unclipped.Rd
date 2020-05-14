@@ -4,7 +4,9 @@
 \name{wiwa_habitat_unclipped}
 \alias{wiwa_habitat_unclipped}
 \title{RasterLayer showing the MaxEnt habitat suitability model unclipped by the known breeding range}
-\format{An object of class \code{RasterLayer} of dimension 80 x 228 x 1.}
+\format{
+An object of class \code{RasterLayer} of dimension 80 x 228 x 1.
+}
 \source{
 Ryan Harrigan
 }

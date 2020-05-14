@@ -4,7 +4,8 @@
 \name{migrant_wiwa_genetic_posteriors}
 \alias{migrant_wiwa_genetic_posteriors}
 \title{Posterior probs of genetic region of origin for 926 WIWAs sampled during migration}
-\format{A tibble with 5,556 rows and 6 columns. The relevant variables for
+\format{
+A tibble with 5,556 rows and 6 columns. The relevant variables for
 analyses here are:
 \describe{
   \item{ID}{unique identifier for each bird}
@@ -13,7 +14,8 @@ analyses here are:
   \item{NumberOfLoci}{Number of loci successfully typed}
   \item{region}{one of the genetic regions}
   \item{posterior}{the posterior prob of originating from that region}
-}}
+}
+}
 \source{
 Kristina Paxton, Kristen Ruegg, Eric Anderson, Thomas Smith
 }

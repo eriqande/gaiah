@@ -4,7 +4,8 @@
 \name{isomap_job54152_prediction}
 \alias{isomap_job54152_prediction}
 \title{Predicted isotope values from ISOMAP}
-\format{A tibble with 10,786 rows and 12 variables. The relevant variables for
+\format{
+A tibble with 10,786 rows and 12 variables. The relevant variables for
 analyses here are:
 \describe{
   \item{lat}{latitude of the predicted location}
@@ -13,7 +14,8 @@ analyses here are:
   \item{stdreg}{Fill in}
   \item{predkrig}{Fill in}
   \item{stdkrig}{Fill in}
-}}
+}
+}
 \source{
 Kristina Paxton and ISOMAP (http://isomap.rcac.purdue.edu:8080/gridsphere/gridsphere)
 }

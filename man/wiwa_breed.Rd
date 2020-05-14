@@ -4,7 +4,8 @@
 \name{wiwa_breed}
 \alias{wiwa_breed}
 \title{a raster of the breeding range of Wilson's warbler}
-\format{This a rasterized version of the breeding range of Wilson's warbler
+\format{
+This a rasterized version of the breeding range of Wilson's warbler
 It contains 1's in the breeding range and 0's elsewhere.
 \describe{
 \item{class}{RasterLayer}
@@ -15,7 +16,8 @@ It contains 1's in the breeding range and 0's elsewhere.
 \item{data source}{in memory}
 \item{names}{layer}
 \item{values}{0, 1  (min, max)}
-}}
+}
+}
 \source{
 The rasters were generated from shapefiles provided to us by
 BirdLife International. (BirdLife International and NatureServe (2012)

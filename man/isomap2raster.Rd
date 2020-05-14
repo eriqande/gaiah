@@ -4,8 +4,7 @@
 \alias{isomap2raster}
 \title{convert columns of an ISOMAP isoscape to a raster object}
 \usage{
-isomap2raster(isoscape, column,
-  Proj = raster::projection(get_wrld_simpl()))
+isomap2raster(isoscape, column, Proj = raster::projection(get_wrld_simpl()))
 }
 \arguments{
 \item{isoscape}{the data frame of prediction.txt from ISOMAP.  The latitude column must be named

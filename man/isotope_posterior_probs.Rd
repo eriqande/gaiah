@@ -4,9 +4,14 @@
 \alias{isotope_posterior_probs}
 \title{compute posterior probabilities of origin given isotope values}
 \usage{
-isotope_posterior_probs(isoscape, ref_birds, assign_birds = NULL,
-  isoscape_pred_column = "predkrig", isoscape_sd_column = "stdkrig",
-  self_assign = FALSE)
+isotope_posterior_probs(
+  isoscape,
+  ref_birds,
+  assign_birds = NULL,
+  isoscape_pred_column = "predkrig",
+  isoscape_sd_column = "stdkrig",
+  self_assign = FALSE
+)
 }
 \arguments{
 \item{isoscape}{the data frame read in from "prediction.txt" from ISOMAP. The

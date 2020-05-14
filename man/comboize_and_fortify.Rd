@@ -4,8 +4,14 @@
 \alias{comboize_and_fortify}
 \title{prepare fortified output for multipanel plot}
 \usage{
-comboize_and_fortify(mgen, miso, mhab, gen_beta_levels = 1,
-  iso_beta_levels = c(1), hab_beta_levels = c(1))
+comboize_and_fortify(
+  mgen,
+  miso,
+  mhab,
+  gen_beta_levels = 1,
+  iso_beta_levels = c(1),
+  hab_beta_levels = c(1)
+)
 }
 \arguments{
 \item{mgen}{genetics posterior raster}

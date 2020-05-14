@@ -4,8 +4,13 @@
 \alias{group_birds_by_location}
 \title{Group bird isotope data by locations}
 \usage{
-group_birds_by_location(D, feather_isotope_col, location_col,
-  iso_pred_col = "iso_pred", iso_sd_col = "iso_sd")
+group_birds_by_location(
+  D,
+  feather_isotope_col,
+  location_col,
+  iso_pred_col = "iso_pred",
+  iso_sd_col = "iso_sd"
+)
 }
 \arguments{
 \item{D}{the data frame of feather isotope data with the isoscape predictions
