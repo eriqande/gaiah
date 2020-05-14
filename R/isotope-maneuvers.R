@@ -133,18 +133,34 @@ group_birds_by_location <- function(D,
                                     iso_pred_col = "iso_pred",
                                     iso_sd_col = "iso_sd") {
 
-  # summarize it all (lots of weird NSE stuff here.  See vignette("nse")
-  ret <- D %>%
-    dplyr::group_by_(location_col) %>%
-    dplyr::summarise_(
-      cnt = ~n(),
-      meanH = lazyeval::interp(~mean(x), x = as.name(feather_isotope_col)),
-      sdH = lazyeval::interp(~stats::sd(x), x = as.name(feather_isotope_col)),
-      meaniso = lazyeval::interp(~mean(x), x = as.name(iso_pred_col)),
-      sdiso = lazyeval::interp(~mean(x), x = as.name(iso_sd_col))
-      )
+  # Deal with quasiquotation.  I have to jump through some hoops because the values
+  # are passed as strings, and I want to keep in that way so I don't have to rewrite
+  # the documentation and also so that it doesn't break any older code that used these
+  # functions.
+  location_col_S <- as.symbol(location_col)
+  feather_isotope_col_S <- as.symbol(feather_isotope_col)
+  iso_pred_col_S <- as.symbol(iso_pred_col)
+  iso_sd_col_S <- as.symbol(iso_sd_col)
 
-  if(any(ret$cnt == 1)) stop("The following locations have only a single bird (not enough to compute an SD): ", paste(ret$Location[ret$cnt==1], collapse = ", "), ".")
+
+  location_col <- rlang::enquo(location_col_S)
+  feather_isotope_col <- rlang::enquo(feather_isotope_col_S)
+  iso_pred_col <- rlang::enquo(iso_pred_col_S)
+  iso_sd_col <- rlang::enquo(iso_sd_col_S)
+
+  ret <- D %>%
+    dplyr::group_by(!! location_col) %>%
+    dplyr::summarise(
+      cnt = n(),
+      meanH = mean(!! feather_isotope_col),
+      sdH = stats::sd(!! feather_isotope_col),
+      meaniso = mean(!! iso_pred_col),
+      sdiso = mean(!! iso_sd_col)
+    )
+
+  if (any(ret$cnt == 1)) {
+    stop("The following locations have only a single bird (not enough to compute an SD): ", paste(ret$Location[ret$cnt == 1], collapse = ", "), ".")
+  }
 
   ret
 }

@@ -18,6 +18,7 @@ Imports:
     maptools,
     raster,
     rgeos,
+    rlang,
     sp,
     stringr,
     tidyr
@@ -27,3 +28,4 @@ Suggests:
 License: CC0
 LazyData: TRUE
 RoxygenNote: 7.1.0
+Encoding: UTF-8
