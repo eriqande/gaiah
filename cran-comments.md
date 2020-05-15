@@ -1,7 +1,7 @@
 ## Test environments
-* local OS X install, R 3.5.1
-* ubuntu 14.04 (on travis-ci), R 3.5.2
-* win-builder (devel and release)
+* local OS X install, R 3.6.2
+* ubuntu 16.04 (on travis-ci), R 4.0.0
+* win-builder (devel and release), R 4.0.0
 
 ## R CMD check results
 0 errors | 0 warnings | 0 notes
@@ -13,7 +13,6 @@ Currently no known reverse dependencies
 
 ## User Notices
 
-Updated a few things for compatibility with the
-soon-to-be-released dplyr 0.8.0.
-
+Revamped a small piece of NSE code for compatibility with
+the soon-to-be-released dplyr 1.0.0.
 
