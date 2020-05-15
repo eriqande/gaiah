@@ -12,19 +12,15 @@ Depends:
 Imports:
     dplyr,
     geosphere,
-    ggplot2,
-    lazyeval,
     magrittr,
     maptools,
     raster,
-    rgeos,
     rlang,
-    sp,
-    stringr,
-    tidyr
+    sp
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown,
+    ggplot2
 License: CC0
 LazyData: TRUE
 RoxygenNote: 7.1.0
