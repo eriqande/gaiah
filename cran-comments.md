@@ -1,7 +1,15 @@
 ## Test environments
-* local OS X install, R 3.6.2
-* ubuntu 16.04 (on travis-ci), R 4.0.0
-* win-builder (devel and release), R 4.0.0
+
+Via GitHub Actions:
+  - macos-latest (release)
+  - ubuntu-latest (devel)
+  - ubuntu-latest (oldrel-1)
+  - ubuntu-latest (release)
+  - windos-latest (release)
+
+Via WinBuilder
+  - Windows R Under development (unstable) (2023-04-26 r84330 ucrt)
+  
 
 ## R CMD check results
 0 errors | 0 warnings | 0 notes
@@ -13,6 +21,5 @@ Currently no known reverse dependencies
 
 ## User Notices
 
-Revamped a small piece of NSE code for compatibility with
-the soon-to-be-released dplyr 1.0.0.
+Removed dependency on maptools, as that package will be removed/archived soon.
 
