@@ -15,7 +15,10 @@ knitr::opts_chunk$set(
 
 # gaiah
 
-[![Travis-CI Build Status](https://travis-ci.org/eriqande/gaiah.svg?branch=master)](https://travis-ci.org/eriqande/gaiah)
+<!-- badges: start -->
+  [![R-CMD-check](https://github.com/eriqande/gaiah/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/eriqande/gaiah/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+  
 
 This is an R-package for performing **G**enetic **A**nd **I**sotopic **A**ssignment using **H**abitat features.
 

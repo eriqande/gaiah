@@ -3,7 +3,7 @@ Title: Genetic and Isotopic Assignment Accounting for Habitat Suitability
 Description: Tools for using genetic markers, stable isotope data, and habitat
     suitability data to calculate posterior probabilities of breeding origin of
     migrating birds.
-Version: 0.0.4
+Version: 0.0.5.999
 Authors@R: c(person(c('Eric', 'C.'), 'Anderson', role = c('cre', 'aut'),
     email = 'eric.anderson@noaa.gov'))
 Maintainer: Eric C. Anderson <eric.anderson@noaa.gov>
@@ -13,7 +13,6 @@ Imports:
     dplyr,
     geosphere,
     magrittr,
-    maptools,
     raster,
     rlang,
     sp
@@ -23,5 +22,5 @@ Suggests:
     ggplot2
 License: CC0
 LazyData: TRUE
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.1
 Encoding: UTF-8

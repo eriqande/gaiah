@@ -114,10 +114,21 @@
 #' head(ws)
 #' \dontrun{plot(ws)}
 get_wrld_simpl <- function() {
-  load(system.file("data/wrld_simpl.rda", package = "maptools"))
   wrld_simpl
 }
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("wrld_simpl")) # keep R CMD Check from making Notes
+
+
+# Since maptools is going away at the end of 2023 I just put this in our package
+#' Simple map of the world
+#'
+#' This is wrld_simpl from the maptools package.  It was all that I used from
+#' the maptools package which is going to be archived at the end of 2023.  So,
+#' I just saved wrld_simpl as a data object in this package.
+#' @format a SpatialPolygonsDataFrame
+#' @source Got this from the old maptools package.  See ?maptools::wrld_simpl
+"wrld_simpl"
+
 
 #' a raster of the breeding range of Wilson's warbler
 #'

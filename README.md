@@ -1,29 +1,43 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-gaiah
-=====
 
-[![Travis-CI Build Status](https://travis-ci.org/eriqande/gaiah.svg?branch=master)](https://travis-ci.org/eriqande/gaiah)
+# gaiah
 
-This is an R-package for performing **G**enetic **A**nd **I**sotopic **A**ssignment using **H**abitat features.
+<!-- badges: start -->
 
-Most of the package has been written by Eric C. Anderson. The methodology for assigning individuals using stable isotope was first written by Hannah Vander Zanden and colleagues. It was reimplemented here and is now efficient enough to do leave one out cross validation, etc. These parts of the code are in the file `R/vander-zanden-appendix.R`.
+[![R-CMD-check](https://github.com/eriqande/gaiah/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/eriqande/gaiah/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
 
-Installing
-----------
+This is an R-package for performing **G**enetic **A**nd **I**sotopic
+**A**ssignment using **H**abitat features.
 
-To install the development version from GitHub with the `devtools` package, you can:
+Most of the package has been written by Eric C. Anderson. The
+methodology for assigning individuals using stable isotope was first
+written by Hannah Vander Zanden and colleagues. It was reimplemented
+here and is now efficient enough to do leave one out cross validation,
+etc. These parts of the code are in the file
+`R/vander-zanden-appendix.R`.
+
+## Installing
+
+To install the development version from GitHub with the `devtools`
+package, you can:
 
 ``` r
 devtools::install_github("eriqande/gaiah")
 ```
 
-Vignettes?
-----------
+## Vignettes?
 
-In lieu of a vignette, we provide the full source code for our use of the `gaiah` package for a recent paper. See below.
+In lieu of a vignette, we provide the full source code for our use of
+the `gaiah` package for a recent paper. See below.
 
-Reproducing the results from Ruegg et al. (2017)
-------------------------------------------------
+## Reproducing the results from Ruegg et al. (2017)
 
-If you want to reproduce all the results from the paper "Genetic assignment with isotopes and habitat suitability (GAIAH), a migratory bird case study" in *Methods in Ecology and Evolution* you will have to get the `gaiah` package and then also clone the analysis repository from <https://github.com/eriqande/gaiah-wiwa> and then follow the instructions in [that repository's README](https://github.com/eriqande/gaiah-wiwa/blob/master/README.md).
+If you want to reproduce all the results from the paper “Genetic
+assignment with isotopes and habitat suitability (GAIAH), a migratory
+bird case study” in *Methods in Ecology and Evolution* you will have to
+get the `gaiah` package and then also clone the analysis repository from
+<https://github.com/eriqande/gaiah-wiwa> and then follow the
+instructions in [that repository’s
+README](https://github.com/eriqande/gaiah-wiwa/blob/master/README.md).

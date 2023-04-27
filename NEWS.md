@@ -1,3 +1,7 @@
+# gaiah 0.0.5
+
+* Removed dependency on maptools package, since it will be archived soon.
+
 # gaiah 0.0.4
 
 * Revamped NSE in `group_birds_by_location90` to fix conflicts with
